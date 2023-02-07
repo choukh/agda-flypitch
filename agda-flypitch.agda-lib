@@ -1,0 +1,3 @@
+name: agda-flypitch
+depend: standard-library
+include: src
