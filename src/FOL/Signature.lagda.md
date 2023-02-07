@@ -1,6 +1,7 @@
 ---
 title: Agda一阶逻辑(1) 签名
 zhihu-tags: Agda, 数理逻辑
+zhihu-url: https://zhuanlan.zhihu.com/p/604316553
 ---
 
 # Agda一阶逻辑(1) 签名
