@@ -1,14 +1,14 @@
 ---
-title: Agda一阶逻辑(2) 定义
+title: Agda一阶逻辑(2) 核心定义
 zhihu-tags: Agda, 数理逻辑
 zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 ---
 
-# Agda一阶逻辑(2) 定义
+# Agda一阶逻辑(2) 核心定义
 
 > 交流Q群: 893531731  
-> 本文源码: [Definition.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Definition.lagda.md)  
-> 高亮渲染: [Definition.html](https://choukh.github.io/agda-flypitch/FOL.Definition.html)  
+> 本文源码: [Base.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Base.lagda.md)  
+> 高亮渲染: [Base.html](https://choukh.github.io/agda-flypitch/FOL.Base.html)  
 
 ## 前言
 
@@ -18,10 +18,10 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Signature
+open import FOL.Dependency using (Signature)
 open Signature
 
-module FOL.Definition {u} (σ : Signature {u}) where
+module FOL.Base {u} (σ : Signature {u}) where
 ```
 
 ### 标准库依赖
@@ -67,7 +67,7 @@ infix 4 _⊢_
 
 ```agda
 data Termₙ : ℕ → Set u where
-  var  : ∀ (n : ℕ) → Termₙ 0
+  var  : ∀ (k : ℕ) → Termₙ 0
   func : ∀ {l} (f : σ .functions l) → Termₙ l
   app  : ∀ {l} (t₁ : Termₙ (suc l)) (t₂ : Termₙ 0) → Termₙ l
 
@@ -326,7 +326,7 @@ axiom2 = axiom (inj₁ (inj₂ refl))
 
 以下规则我们直接列出名称而不再加以说明.
 
-### 归谬法
+### 爆炸律
 
 ```agda
 exfalso : ∀ {Γ φ} → Γ ⊢ ⊥ → Γ ⊢ φ
