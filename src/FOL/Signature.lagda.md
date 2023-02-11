@@ -1,16 +1,14 @@
 ---
-title: Agda一阶逻辑(1) 签名与结构
+title: Agda一阶逻辑(1) 签名
 zhihu-tags: Agda, 数理逻辑
 zhihu-url: https://zhuanlan.zhihu.com/p/604316553
 ---
 
-# Agda一阶逻辑(1) 签名与结构
+# Agda一阶逻辑(1) 签名
 
 > 交流Q群: 893531731  
-> 本文源码: [Dependency.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Dependency.lagda.md)  
-> 高亮渲染: [Dependency.html](https://choukh.github.io/agda-flypitch/FOL.Dependency.html)  
-
-## 前言
+> 本文源码: [Signature.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Signature.lagda.md)  
+> 高亮渲染: [Signature.html](https://choukh.github.io/agda-flypitch/FOL.Signature.html)  
 
 一阶逻辑是一种形式语言, 其语句由一些原始符号按一定的语法组合而成. 符号又分为逻辑符号和非逻辑符号. 本篇先讲非逻辑符号.
 
@@ -26,19 +24,16 @@ $$R^n_0,\ R^n_1,\ R^n_2,\ R^n_3,\ ...$$
 
 在这种处理下, 只有唯一一种一阶逻辑语言.
 
-较现代的方式是根据最终要实现的一阶理论来指定该理论所需的非逻辑符号. 这些特定的符号以及它们的元数所组成的资料叫做理论的**签名 (signature)**. 在这种处理下, 每种签名都对应一种一阶逻辑语言 (在有些书中签名就叫做语言). 另外, 这些符号的实际所指, 所组成的资料叫做结构. 由于一阶逻辑的其他部分都是参数化到签名和结构上的, 我们把它们单独作为一个模块.
+较现代的方式是根据最终要实现的一阶理论来指定该理论所需的非逻辑符号. 这些特定的符号以及它们的元数所组成的资料叫做理论的**签名 (signature)**. 在这种处理下, 每种签名都对应一种一阶逻辑语言 (在有些书中签名就叫做语言). 由于一阶逻辑的其他部分都是参数化到签名的, 我们把它单独作为一个模块.
 
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
 
-module FOL.Dependency where
+module FOL.Signature where
 
 open import Level using (suc)
 open import Data.Nat using (ℕ)
-open import Data.Vec using (Vec)
 ```
-
-## 签名
 
 **定义 (签名)** 由按元数分类的函数符号集族 `functions : ℕ → Set u` 以及按元数分类的关系符号集族 `relations : ℕ → Set u` 组成的资料叫做签名. 其中 `u` 是宇宙多态参数. 签名比符号集高一个宇宙. 常量集是元数为 0 的函数集.
 
@@ -69,18 +64,4 @@ module ExampleSignaturePA where
     { functions = func
     ; relations = rel
     }
-```
-
-## 结构
-
-函数符号和关系符号的实际所指所组成的资料叫做结构. 它由一个集合 `carrier` (也可以叫做论域) 以及两个映射 `funmap` 和 `relmap` 组成. 其中 `funmap` 用于映射函数符号到元函数, `relmap` 用于映射关系符号到元关系. 注意函数和关系的n元参数编码为n维向量.
-
-```agda
-open Signature
-
-record Structure {u} {σ : Signature {u}} : Set (suc u) where
-  field
-    carrier : Set u
-    funmap : ∀ {n} → σ .functions n → Vec carrier n → carrier
-    relmap : ∀ {n} → σ .relations n → Vec carrier n → Set u
 ```

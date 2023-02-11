@@ -1,10 +1,10 @@
 ---
-title: Agda一阶逻辑(2) 核心定义
+title: Agda一阶逻辑(2) 定义
 zhihu-tags: Agda, 数理逻辑
 zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 ---
 
-# Agda一阶逻辑(2) 核心定义
+# Agda一阶逻辑(2) 定义
 
 > 交流Q群: 893531731  
 > 本文源码: [Base.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Base.lagda.md)  
@@ -12,13 +12,13 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 
 ## 前言
 
-本篇引入一阶逻辑的核心定义, 而性质的证明则放在后篇. 如上一篇所说, 本篇的所有内容都是参数化到签名之上的.
+本篇引入一阶逻辑的核心定义, 而性质的证明则放在后篇. 如上一篇所说, 本篇的所有内容都参数化到签名.
 
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Dependency using (Signature)
+open import FOL.Signature using (Signature)
 open Signature
 
 module FOL.Base {u} (σ : Signature {u}) where
@@ -204,10 +204,13 @@ insert_into_at_ : ∀ {u} {T : Set u} (s : T) (v : ℕ → T) (n : ℕ) → (ℕ
 其中, `insert (s ↑ n) into var at n` 的意思是往 `var` 中插入 `s ↑ n` 于 `n` 处. 将 `s` 提升 `n` 是为了保证 `s` 中的变量不会与 `t` 中的变量冲突.
 
 ```agda
-_[_/ₜ_] : ∀ {l} (t : Termₙ l) (s : Term) (n : ℕ) → Termₙ l
-var k     [ s /ₜ n ] = insert (s ↑ n) into var at n $ k
-func f    [ s /ₜ n ] = func f
-app t₁ t₂ [ s /ₜ n ] = app (t₁ [ s /ₜ n ]) (t₂ [ s /ₜ n ])
+_[_/_]ᵥ : ∀ {u} {T : Set u} (v : ℕ → T) (s : T) (n : ℕ) → (ℕ → T)
+v [ s / n ]ᵥ = insert s into v at n
+
+_[_/_]ₜ : ∀ {l} (t : Termₙ l) (s : Term) (n : ℕ) → Termₙ l
+var k     [ s / n ]ₜ = var [ (s ↑ n) / n ]ᵥ $ k
+func f    [ s / n ]ₜ = func f
+app t₁ t₂ [ s / n ]ₜ = app (t₁ [ s / n ]ₜ) (t₂ [ s / n ]ₜ)
 ```
 
 对公式的变量替换基本上就是对其中的项进行变量替换, 或者是对公式中的公式递归地替换. 只是对于量词构造的公式, 将替换的位置顺延一位, 因为首位是量词的绑定变量.
@@ -216,8 +219,8 @@ app t₁ t₂ [ s /ₜ n ] = app (t₁ [ s /ₜ n ]) (t₂ [ s /ₜ n ])
 _[_/_] : ∀ {l} (φ : Formulaₙ l) (s : Term) (n : ℕ) → Formulaₙ l
 ⊥         [ s / n ] = ⊥
 rel R     [ s / n ] = rel R
-appᵣ φ t  [ s / n ] = appᵣ (φ [ s / n ]) (t [ s /ₜ n ])
-(t₁ ≈ t₂) [ s / n ] = t₁ [ s /ₜ n ] ≈ t₂ [ s /ₜ n ]
+appᵣ φ t  [ s / n ] = appᵣ (φ [ s / n ]) (t [ s / n ]ₜ)
+(t₁ ≈ t₂) [ s / n ] = t₁ [ s / n ]ₜ ≈ t₂ [ s / n ]ₜ
 (φ₁ ⇒ φ₂) [ s / n ] = φ₁ [ s / n ] ⇒ φ₂ [ s / n ]
 ∀' φ      [ s / n ] = ∀' (φ [ s / suc n ])
 ```
