@@ -13,6 +13,7 @@ zhihu-tags: Agda, 数理逻辑
 
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
+{-# OPTIONS -W noUnsupportedIndexedMatch #-}
 
 open import FOL.Signature
 module FOL.Realization {u} (σ : Signature {u}) where

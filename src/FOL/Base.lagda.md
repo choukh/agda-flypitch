@@ -28,13 +28,13 @@ module FOL.Base {u} (σ : Signature {u}) where
 
 ```agda
 open import Level renaming (suc to lsuc)
-open import Data.Bool using (if_then_else_)
-open import Data.Nat using (ℕ; suc; _<ᵇ_; _+_; _∸_)
+open import Data.Nat using (ℕ; suc; _<?_; _+_; _∸_)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
-open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl)
+open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Unary using (Pred; _∈_; _⊆_)
+open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl)
 open import StdlibExt.Relation.Unary renaming (_⨭_ to _,_; ⨭⊆⨭ to ,⊆,; ⊆⨭ to ⊆,; ⊆⟦⨭⟧ to ⊆⟦,⟧)
 ```
 
@@ -161,7 +161,9 @@ _⇔_ : Formula → Formula → Formula
 
 ```agda
 _↑[_]_ : ∀ {l} (t : Termₙ l) (m n : ℕ) → Termₙ l
-var k     ↑[ m ] n = if k <ᵇ m then var k else var (k + n)
+var k     ↑[ m ] n with k <? m
+... | yes _ = var k
+... | no  _ = var (k + n)
 func f    ↑[ m ] n = func f
 app t₁ t₂ ↑[ m ] n = app (t₁ ↑[ m ] n) (t₂ ↑[ m ] n)
 
@@ -196,7 +198,11 @@ _↥_ : ∀ {l} (φ : Formulaₙ l) (n : ℕ) → Formulaₙ l
 
 ```agda
 insert_into_at_ : ∀ {u} {T : Set u} (s : T) (v : ℕ → T) (n : ℕ) → (ℕ → T)
-(insert s into v at n) k = if k <ᵇ n then v k else if n <ᵇ k then v (k ∸ 1) else s
+(insert s into v at n) k with k <? n
+... | yes _ = v k
+... | no  _ with n <? k
+... | yes _ = v (k ∸ 1)
+... | no  _ = s
 ```
 
 将项 `t` 中的变量 `var n` (如果存在) 替换为项 `s` 后得到的项记作 `t [ s /ₜ n ]`. 如果项是变量 `var k`, 那么将变量符号表 `var` 改造成 `insert (s ↑ n) into var at n`, 再取其中的第 `k` 个. 如果项是函数应用, 那么递归地替换其中的项.
