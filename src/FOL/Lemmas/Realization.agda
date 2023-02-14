@@ -17,10 +17,18 @@ open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; refl;
 open import StdlibExt.Data.Vec using ([]-refl)
 open import StdlibExt.Data.Nat.Properties using (n<n+1)
 open import StdlibExt.Relation.Binary.PropositionalEquivalence u
-open Eq.≡-Reasoning
+
+[/]ᵥ-cong : ∀ {u} {T : Set u} {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
+  → (𝓋 [ s / n ]ᵥ) k ≡ (𝓊 [ s / n ]ᵥ) k
+[/]ᵥ-cong ext s n k with k <? n
+... | yes _ = ext k
+... | no  _ with n <? k
+... | yes _ = ext (k ∸ 1)
+... | no  _ = refl
 
 module PreRealizationLemmas (𝒮 : Structure σ) where
   open PreRealization 𝒮 renaming (realizeₜ to rₜ; realize to r)
+  open Eq.≡-Reasoning
   open Equivalence
 
   realizeₜ-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒮 .carrier) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
@@ -84,9 +92,4 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
   realize-cong 𝓋 𝓊 ext (∀' φ) xs =
     let ih = λ s → realize-cong (𝓋 [ s / 0 ]ᵥ) (𝓊 [ s / 0 ]ᵥ) ([/]ᵥ-cong ext s 0) φ xs in
     mk↔ (λ f x → to   (ih x) ⟨$⟩ f x)
-        (λ f x → from (ih x) ⟨$⟩ f x) where
-    [/]ᵥ-cong : ∀ {u} {T : Set u} {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
-      → (𝓋 [ s / n ]ᵥ) k ≡ (𝓊 [ s / n ]ᵥ) k
-    [/]ᵥ-cong ext s n k with k <? n
-    ... | yes p = ext k
-    ... | no ¬p = {!   !}
+        (λ f x → from (ih x) ⟨$⟩ f x)
