@@ -93,3 +93,20 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     let ih = λ s → realize-cong (𝓋 [ s / 0 ]ᵥ) (𝓊 [ s / 0 ]ᵥ) ([/]ᵥ-cong ext s 0) φ xs in
     mk↔ (λ f x → to   (ih x) ⟨$⟩ f x)
         (λ f x → from (ih x) ⟨$⟩ f x)
+
+  realize-subst : ∀ {l} (𝓋 : ℕ → 𝒮 .carrier) (n : ℕ) (φ : Formulaₙ l)
+    (s : Term) (xs : Vec (𝒮 .carrier) l)
+    → r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) φ xs ↔ r 𝓋 (φ [ s / n ]) xs
+  realize-subst 𝓋 n ⊥          s xs = id
+  realize-subst 𝓋 n (rel r₁)   s xs = id
+  realize-subst 𝓋 n (appᵣ φ t) s xs
+    rewrite realizeₜ-subst 𝓋 n t s [] = realize-subst 𝓋 n φ s _
+  realize-subst 𝓋 n (t₁ ≈ t₂) s xs
+    rewrite realizeₜ-subst 𝓋 n t₁ s xs
+          | realizeₜ-subst 𝓋 n t₂ s xs = id
+  realize-subst 𝓋 n (φ₁ ⇒ φ₂) s xs =
+    let ih₁ = realize-subst 𝓋 n φ₁ s xs
+        ih₂ = realize-subst 𝓋 n φ₂ s xs in
+    mk↔ (λ f x → to   ih₂ ⟨$⟩ (f $ from ih₁ ⟨$⟩ x))
+        (λ f x → from ih₂ ⟨$⟩ (f $ to   ih₁ ⟨$⟩ x))
+  realize-subst 𝓋 n (∀' φ) s xs = {!   !}
