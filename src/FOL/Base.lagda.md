@@ -17,6 +17,7 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
+{-# OPTIONS -W noUnsupportedIndexedMatch #-}
 
 open import FOL.Signature using (Signature)
 open Signature

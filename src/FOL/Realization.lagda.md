@@ -62,7 +62,7 @@ module PreRealization (𝒮 : Structure σ) where
   realize 𝓋 ⊥          xs = False
   realize 𝓋 (rel r)    xs = 𝒮 .relmap r xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
-  realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ ≡ realizeₜ 𝓋 t₂
+  realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
   realize 𝓋 (∀' φ)     xs = ∀ x → realize (𝓋 [ x / 0 ]ᵥ) φ xs
 ```
