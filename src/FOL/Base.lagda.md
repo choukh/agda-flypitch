@@ -17,7 +17,6 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
-{-# OPTIONS -W noUnsupportedIndexedMatch #-}
 
 open import FOL.Signature using (Signature)
 open Signature
@@ -30,11 +29,13 @@ module FOL.Base {u} (σ : Signature {u}) where
 ```agda
 open import Level renaming (suc to lsuc)
 open import Data.Nat using (ℕ; suc; _<?_; _+_; _∸_)
+open import Data.Nat.Properties using (<-cmp)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Unary using (Pred; _∈_; _⊆_)
+open import Relation.Binary using (tri<; tri≈; tri>)
 open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl)
 open import StdlibExt.Relation.Unary renaming (_⨭_ to _,_; ⨭⊆⨭ to ,⊆,; ⊆⨭ to ⊆,; ⊆⟦⨭⟧ to ⊆⟦,⟧)
 ```
@@ -199,11 +200,10 @@ _↥_ : ∀ {l} (φ : Formulaₙ l) (n : ℕ) → Formulaₙ l
 
 ```agda
 insert_into_at_ : ∀ {u} {T : Set u} (s : T) (v : ℕ → T) (n : ℕ) → (ℕ → T)
-(insert s into v at n) k with k <? n
-... | yes _ = v k
-... | no  _ with n <? k
-... | yes _ = v (k ∸ 1)
-... | no  _ = s
+(insert s into v at n) k with <-cmp k n
+... | tri< _ _ _ = v k
+... | tri≈ _ _ _ = s
+... | tri> _ _ _ = v (k ∸ 1)
 ```
 
 将项 `t` 中的变量 `var n` (如果存在) 替换为项 `s` 后得到的项记作 `t [ s /ₜ n ]`. 如果项是变量 `var k`, 那么将变量符号表 `var` 改造成 `insert (s ↑ n) into var at n`, 再取其中的第 `k` 个. 如果项是函数应用, 那么递归地替换其中的项.

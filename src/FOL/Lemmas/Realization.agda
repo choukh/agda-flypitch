@@ -1,30 +1,21 @@
 {-# OPTIONS --cubical-compatible --safe #-}
-{-# OPTIONS -W noUnsupportedIndexedMatch #-}
 
 open import FOL.Signature
 module FOL.Lemmas.Realization {u} (σ : Signature {u}) where
 open import FOL.Base (σ) hiding (⊥-elim)
+open import FOL.Lemmas.Substitution (σ)
 open import FOL.Realization (σ)
 open Structure
 
-open import Data.Empty using (⊥-elim)
 open import Data.Nat
-open import Data.Nat.Properties
+open import Data.Empty using (⊥-elim)
 open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; refl; cong)
 open import StdlibExt.Data.Vec using ([]-refl)
-open import StdlibExt.Data.Nat.Properties using (n<n+1)
+open import StdlibExt.Data.Nat.Properties
 open import StdlibExt.Relation.Binary.PropositionalEquivalence u
-
-[/]ᵥ-cong : ∀ {u} {T : Set u} {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
-  → (𝓋 [ s / n ]ᵥ) k ≡ (𝓊 [ s / n ]ᵥ) k
-[/]ᵥ-cong ext s n k with k <? n
-... | yes _ = ext k
-... | no  _ with n <? k
-... | yes _ = ext (k ∸ 1)
-... | no  _ = refl
 
 module PreRealizationLemmas (𝒮 : Structure σ) where
   open PreRealization 𝒮 renaming (realizeₜ to rₜ; realize to r)
