@@ -7,6 +7,7 @@ open import FOL.Base (σ) hiding (⊥-elim)
 open import Data.Nat
 open import Data.Nat.Properties
 open import Data.Empty using (⊥-elim)
+open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl; cong)
 
@@ -15,9 +16,9 @@ open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl; cong)
 ↑[]↑[] (var k) n₁ m₁ n₂ m₂ ≤₁ ≤₂ with k <? m₁
 ... | yes p with k <? m₂
 ... | yes _ = refl
-... | no ¬q = ⊥-elim (¬q (≤-trans p ≤₁))
+... | no ¬q = ⊥-elim $ ¬q $ ≤-trans p ≤₁
 ↑[]↑[] (var k) n₁ m₁ n₂ m₂ ≤₁ ≤₂ | no ¬p with k + n₁ <? m₂
-... | yes q = ⊥-elim (¬p (+-cancelʳ-≤ (suc k) m₁ (≤-trans q ≤₂)))
+... | yes q = ⊥-elim $ ¬p $ +-cancelʳ-≤ (suc k) m₁ (≤-trans q ≤₂)
 ... | no  _ = cong var (+-assoc k _ _)
 ↑[]↑[] (func f) n₁ m₁ n₂ m₂ ≤₁ ≤₂ = refl
 ↑[]↑[] (app t₁ t₂) n₁ m₁ n₂ m₂ ≤₁ ≤₂
