@@ -3,6 +3,7 @@
 open import FOL.Signature
 module FOL.Lemmas.Realization {u} (σ : Signature {u}) where
 open import FOL.Base (σ) hiding (⊥-elim; subst)
+open import FOL.Lemmas.Lifting (σ)
 open import FOL.Lemmas.Substitution (σ)
 open import FOL.Realization (σ)
 open Structure
@@ -13,11 +14,12 @@ open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary using (tri<; tri≈; tri>)
-open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; refl; cong; subst)
+open import Relation.Binary.PropositionalEquality.Core as Eq
+  using (_≡_; refl; sym; cong; subst)
 open import StdlibExt.Data.Vec using ([]-refl)
 open import StdlibExt.Data.Nat.Properties
 open import StdlibExt.Relation.Binary.PropositionalEquivalence u
-  renaming (begin_ to begin↔_; _∎ to _∎↔)
+  renaming (begin_ to begin↔_; _∎ to _∎↔) hiding (sym)
 open Eq.≡-Reasoning
 
 module PreRealizationLemmas (𝒮 : Structure σ) where
@@ -95,8 +97,20 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
   realize-subst 𝓋 n (φ₁ ⇒ φ₂) s xs =
     →-cong (realize-subst 𝓋 n φ₁ s xs) (realize-subst 𝓋 n φ₂ s xs)
   realize-subst 𝓋 n (∀' φ) s xs = ∀-cong $ λ x →
-    let t = rₜ (𝓋 [ x / 0 ]ᵥ) (s ↑ suc n) [] in       begin↔
-    r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ [ x / 0 ]ᵥ) φ xs    ≈⟨ {!   !} ⟩
-    r (𝓋 [ t / n ]ᵥ [ x / 0 ]ᵥ) φ xs                  ≈⟨ realize-cong _ _ (//ᵥ 𝓋 x t 0 n) φ xs ⟩
-    r (𝓋 [ x / 0 ]ᵥ [ t / suc n ]ᵥ) φ xs              ≈⟨ realize-subst (𝓋 [ x / 0 ]ᵥ) (suc n) φ s xs ⟩
-    r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs             ∎↔
+    let t₁ = rₜ (𝓋 [ x / 0 ]ᵥ) (s ↑ suc n)   []
+        t₂ = rₜ (𝓋 [ x / 0 ]ᵥ) ((s ↑ n) ↑ 1) []
+        𝓋₁ = 𝓋 [ t₁ / n ]ᵥ [ x / 0 ]ᵥ
+        𝓋₂ = 𝓋 [ t₂ / n ]ᵥ [ x / 0 ]ᵥ
+        t≡ : t₂ ≡ t₁
+        t≡ = cong (λ t → rₜ (𝓋 [ x / 0 ]ᵥ) t []) (↑↑˘ s n 1)
+        𝓋≡₁ : ∀ m → 𝓋₂ m ≡ 𝓋₁ m
+        𝓋≡₁ m = cong (λ t → (𝓋 [ t / n ]ᵥ [ x / 0 ]ᵥ) m) t≡
+        𝓋₃ = 𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ [ x / 0 ]ᵥ
+        𝓋≡₂ : ∀ m → 𝓋₃ m ≡ 𝓋₂ m
+        𝓋≡₂ m = sym $ cong (λ t → (𝓋 [ t / n ]ᵥ [ x / 0 ]ᵥ) m) (realizeₜ-subst-lift 𝓋 0 (s ↑ n) x [])
+    in begin↔
+    r 𝓋₃ φ xs                             ≈⟨ realize-cong _ _ 𝓋≡₂ φ xs ⟩
+    r 𝓋₂ φ xs                             ≈⟨ realize-cong _ _ 𝓋≡₁ φ xs ⟩
+    r 𝓋₁ φ xs                             ≈⟨ realize-cong _ _ (//ᵥ 𝓋 x t₁ 0 n) φ xs ⟩
+    r (𝓋 [ x / 0 ]ᵥ [ t₁ / suc n ]ᵥ) φ xs ≈⟨ realize-subst (𝓋 [ x / 0 ]ᵥ) (suc n) φ s xs ⟩
+    r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs ∎↔
