@@ -17,11 +17,11 @@ open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; refl;
 open import StdlibExt.Data.Vec using ([]-refl)
 open import StdlibExt.Data.Nat.Properties
 open import StdlibExt.Relation.Binary.PropositionalEquivalence u
+  renaming (begin_ to begin↔_; _∎ to _∎↔)
+open Eq.≡-Reasoning
 
 module PreRealizationLemmas (𝒮 : Structure σ) where
   open PreRealization 𝒮 renaming (realizeₜ to rₜ; realize to r)
-  open Eq.≡-Reasoning
-  open Equivalence
 
   realizeₜ-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒮 .carrier) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
     (t : Termₙ l) (xs : Vec (𝒮 .carrier) l)
@@ -78,14 +78,9 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     rewrite realizeₜ-cong 𝓋 𝓊 ext t₁ xs
           | realizeₜ-cong 𝓋 𝓊 ext t₂ xs = id
   realize-cong 𝓋 𝓊 ext (φ₁ ⇒ φ₂) xs =
-    let ih₁ = realize-cong 𝓋 𝓊 ext φ₁ xs
-        ih₂ = realize-cong 𝓋 𝓊 ext φ₂ xs in
-    mk↔ (λ f x → to   ih₂ ⟨$⟩ (f $ from ih₁ ⟨$⟩ x))
-        (λ f x → from ih₂ ⟨$⟩ (f $ to   ih₁ ⟨$⟩ x))
-  realize-cong 𝓋 𝓊 ext (∀' φ) xs =
-    let ih = λ s → realize-cong (𝓋 [ s / 0 ]ᵥ) (𝓊 [ s / 0 ]ᵥ) (/ᵥ-cong ext s 0) φ xs in
-    mk↔ (λ f x → to   (ih x) ⟨$⟩ f x)
-        (λ f x → from (ih x) ⟨$⟩ f x)
+    →-cong (realize-cong 𝓋 𝓊 ext φ₁ xs) (realize-cong 𝓋 𝓊 ext φ₂ xs)
+  realize-cong 𝓋 𝓊 ext (∀' φ) xs = ∀-cong $ λ x
+    → realize-cong (𝓋 [ x / 0 ]ᵥ) (𝓊 [ x / 0 ]ᵥ) (/ᵥ-cong ext x 0) φ xs
 
   realize-subst : ∀ {l} (𝓋 : ℕ → 𝒮 .carrier) (n : ℕ) (φ : Formulaₙ l)
     (s : Term) (xs : Vec (𝒮 .carrier) l)
@@ -98,8 +93,10 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     rewrite realizeₜ-subst 𝓋 n t₁ s xs
           | realizeₜ-subst 𝓋 n t₂ s xs = id
   realize-subst 𝓋 n (φ₁ ⇒ φ₂) s xs =
-    let ih₁ = realize-subst 𝓋 n φ₁ s xs
-        ih₂ = realize-subst 𝓋 n φ₂ s xs in
-    mk↔ (λ f x → to   ih₂ ⟨$⟩ (f $ from ih₁ ⟨$⟩ x))
-        (λ f x → from ih₂ ⟨$⟩ (f $ to   ih₁ ⟨$⟩ x))
-  realize-subst 𝓋 n (∀' φ) s xs = {!   !}
+    →-cong (realize-subst 𝓋 n φ₁ s xs) (realize-subst 𝓋 n φ₂ s xs)
+  realize-subst 𝓋 n (∀' φ) s xs = ∀-cong $ λ x →
+    let t = rₜ (𝓋 [ x / 0 ]ᵥ) (s ↑ suc n) [] in       begin↔
+    r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ [ x / 0 ]ᵥ) φ xs    ≈⟨ {!   !} ⟩
+    r (𝓋 [ t / n ]ᵥ [ x / 0 ]ᵥ) φ xs                  ≈⟨ realize-cong _ _ (//ᵥ 𝓋 x t 0 n) φ xs ⟩
+    r (𝓋 [ x / 0 ]ᵥ [ t / suc n ]ᵥ) φ xs              ≈⟨ realize-subst (𝓋 [ x / 0 ]ᵥ) (suc n) φ s xs ⟩
+    r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs             ∎↔
