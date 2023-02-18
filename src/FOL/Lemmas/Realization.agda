@@ -83,7 +83,7 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     mk↔ (λ f x → to   ih₂ ⟨$⟩ (f $ from ih₁ ⟨$⟩ x))
         (λ f x → from ih₂ ⟨$⟩ (f $ to   ih₁ ⟨$⟩ x))
   realize-cong 𝓋 𝓊 ext (∀' φ) xs =
-    let ih = λ s → realize-cong (𝓋 [ s / 0 ]ᵥ) (𝓊 [ s / 0 ]ᵥ) ([/]ᵥ-cong ext s 0) φ xs in
+    let ih = λ s → realize-cong (𝓋 [ s / 0 ]ᵥ) (𝓊 [ s / 0 ]ᵥ) (/ᵥ-cong ext s 0) φ xs in
     mk↔ (λ f x → to   (ih x) ⟨$⟩ f x)
         (λ f x → from (ih x) ⟨$⟩ f x)
 
