@@ -16,7 +16,7 @@ zhihu-tags: Agda, 数理逻辑
 
 open import FOL.Signature
 module FOL.Interpretation {u} (σ : Signature {u}) where
-open import FOL.Base (σ)
+open import FOL.Base (σ) hiding (⊥-elim)
 open Signature
 ```
 
@@ -24,13 +24,17 @@ open Signature
 
 ```agda
 open import Level
-open import Data.Bool
-open import Data.Empty.Polymorphic renaming (⊥ to False)
+open import Data.Bool using (Bool; T; true; false)
+open import Data.Empty using (⊥-elim)
+open import Data.Empty.Polymorphic renaming (⊥ to False) hiding (⊥-elim)
 open import Data.Nat using (ℕ)
 open import Data.Vec using (Vec; []; _∷_)
+open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
 open import Relation.Unary using (Pred; _∈_)
+open import Relation.Binary using (Decidable)
 open import Relation.Binary.PropositionalEquality using (_≡_)
+open import Relation.Nullary using (Dec; yes; no)
 ```
 
 ## 解释 (结构)
@@ -41,6 +45,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 record Interpretation : Set (suc u) where
   field
     domain : Set u
+    dec-eq : Decidable {A = domain} _≡_
     funmap : ∀ {n} → σ .functions n → Vec domain n → domain
     relmap : ∀ {n} → σ .relations n → Vec domain n → Bool
 
@@ -69,17 +74,33 @@ module PreRealizer (𝒾 : Interpretation) where
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
   realize 𝓋 (∀' φ)     xs = ∀ x → realize (𝓋 [ x / 0 ]ᵥ) φ xs
+
+  dec : ∀ {l} 𝓋 φ (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
+  dec 𝓋 ⊥ xs = no λ ()
+  dec 𝓋 (rel r) xs with 𝒾 .relmap r xs
+  ... | true  = yes tt
+  ... | false = no λ ()
+  dec 𝓋 (appᵣ φ t) xs = dec 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
+  dec 𝓋 (t₁ ≈ t₂) [] = 𝒾 .dec-eq (realizeₜ 𝓋 t₁ []) (realizeₜ 𝓋 t₂ [])
+  dec 𝓋 (φ₁ ⇒ φ₂) xs with dec 𝓋 φ₁ xs | dec 𝓋 φ₂ xs
+  ... | _     | yes q = yes λ _ → q
+  ... | yes p | no ¬q = no  λ p→q → ¬q $ p→q p
+  ... | no ¬p | no _  = yes λ p → ⊥-elim $ ¬p p
+  dec 𝓋 (∀' φ) xs = {!   !}
 ```
 
 ```agda
 module Realizer (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
-  open PreRealizer 𝒾 renaming (realizeₜ to rₜ; realize to r)
+  open PreRealizer 𝒾 renaming (realizeₜ to rₜ; realize to r; dec to d)
 
   realizeₜ : Term → 𝒾 .domain
   realizeₜ t = rₜ 𝓋 t []
 
   realize : Formula → Set u
   realize φ = r 𝓋 φ []
+
+  dec : ∀ φ → Dec (realize φ)
+  dec φ = d 𝓋 φ []
 
   valid : Theory → Set u
   valid Γ = ∀ φ → φ ∈ Γ → realize φ

@@ -17,6 +17,7 @@ module FOL.Properties.Soundness {u} (σ : Signature {u}) where
 open import FOL.Base (σ)
 open import FOL.Interpretation (σ)
 open import FOL.Lemmas.Realization (σ)
+open Interpretation
 open Realizer
 
 open import Level using (lift)
@@ -31,9 +32,6 @@ open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_)
 ```
 
 ```agda
-dec : ∀ 𝒾 𝓋 φ → Dec (realize 𝒾 𝓋 φ)
-dec 𝒾 𝓋 φ = {!   !}
-
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
 soundness (axiom φ∈Γ) 𝒾 𝓋 v = v _ φ∈Γ
 soundness {Γ} {φ} (⊥-elim ⊢₀) 𝒾 𝓋 v = byContra (dec 𝒾 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒾 𝓋
