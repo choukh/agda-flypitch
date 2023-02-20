@@ -9,7 +9,7 @@ open import Data.Empty using (⊥-elim)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary using (tri<; tri≈; tri>)
-open import Relation.Binary.PropositionalEquality.Core
+open import Relation.Binary.PropositionalEquality
   using (_≡_; refl; cong; sym; trans; subst)
 open import StdlibExt.Data.Nat.Properties
 

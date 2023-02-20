@@ -2,11 +2,12 @@
 
 open import FOL.Signature
 module FOL.Lemmas.Realization {u} (σ : Signature {u}) where
+
 open import FOL.Base (σ) hiding (⊥-elim; subst)
 open import FOL.Lemmas.Lifting (σ)
 open import FOL.Lemmas.Substitution (σ)
 open import FOL.Realization (σ)
-open Structure
+open Interpretation
 
 open import Data.Nat
 open import Data.Empty using (⊥-elim)
@@ -14,19 +15,18 @@ open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary using (tri<; tri≈; tri>)
-open import Relation.Binary.PropositionalEquality.Core as Eq
+open import Relation.Binary.PropositionalEquality as Eq
   using (_≡_; refl; sym; cong; subst)
 open import StdlibExt.Data.Vec using ([]-refl)
 open import StdlibExt.Data.Nat.Properties
-open import StdlibExt.Relation.Binary.PropositionalEquivalence u
-  renaming (begin_ to begin↔_; _∎ to _∎↔) hiding (sym)
-open Eq.≡-Reasoning
+open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (sym)
 
-module PreRealizationLemmas (𝒮 : Structure σ) where
-  open PreRealization 𝒮 renaming (realizeₜ to rₜ; realize to r)
+module Preₜ (𝒾 : Interpretation) where
+  open PreRealization 𝒾 renaming (realizeₜ to rₜ; realize to r) public
+  open Eq.≡-Reasoning
 
-  realizeₜ-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒮 .carrier) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
-    (t : Termₙ l) (xs : Vec (𝒮 .carrier) l)
+  realizeₜ-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒾 .domain) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
+    (t : Termₙ l) (xs : Vec (𝒾 .domain) l)
     → rₜ 𝓋 t xs ≡ rₜ 𝓊 t xs
   realizeₜ-cong 𝓋 𝓊 ext (var k)     xs = ext k
   realizeₜ-cong 𝓋 𝓊 ext (func f)    xs = refl
@@ -34,8 +34,8 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     rewrite realizeₜ-cong 𝓋 𝓊 ext t₂ []
     rewrite realizeₜ-cong 𝓋 𝓊 ext t₁ (rₜ 𝓊 t₂ [] ∷ xs) = refl
 
-  realizeₜ-subst : ∀ {l} (𝓋 : ℕ → 𝒮 .carrier) (n : ℕ) (t : Termₙ l)
-    (s : Term) (xs : Vec (𝒮 .carrier) l)
+  realizeₜ-subst : ∀ {l} (𝓋 : ℕ → 𝒾 .domain) (n : ℕ) (t : Termₙ l)
+    (s : Term) (xs : Vec (𝒾 .domain) l)
     → rₜ (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) t xs ≡ rₜ 𝓋 (t [ s / n ]ₜ) xs
   realizeₜ-subst 𝓋 n (var k) s xs with <-cmp k n
   ... | tri< _ _ _ = refl
@@ -48,8 +48,8 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     rₜ 𝓋' t₁             (rₜ 𝓋 (t₂ [ s / n ]ₜ) [] ∷ xs) ≡⟨ realizeₜ-subst 𝓋 n t₁ s _ ⟩
     rₜ 𝓋 (t₁ [ s / n ]ₜ) (rₜ 𝓋 (t₂ [ s / n ]ₜ) [] ∷ xs) ∎
 
-  realizeₜ-subst-lift : ∀ {l} (𝓋 : ℕ → 𝒮 .carrier) (n : ℕ) (t : Termₙ l)
-    (x : 𝒮 .carrier) (xs : Vec (𝒮 .carrier) l)
+  realizeₜ-subst-lift : ∀ {l} (𝓋 : ℕ → 𝒾 .domain) (n : ℕ) (t : Termₙ l)
+    (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
     → rₜ (𝓋 [ x / n ]ᵥ) (t ↑[ n ] 1) xs ≡ rₜ 𝓋 t xs
   realizeₜ-subst-lift 𝓋 n (var k) x xs with <-cmp k n | k <? n
   ... | tri≈ ¬p _ _ | yes p = ⊥-elim $ ¬p p
@@ -69,8 +69,12 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
     rₜ 𝓋 t₁             (rₜ 𝓋' (t₂ ↑[ n ] 1) [] ∷ xs) ≡⟨ cong (rₜ 𝓋 t₁) $ cong (_∷ xs) (realizeₜ-subst-lift 𝓋 n t₂ x []) ⟩
     rₜ 𝓋 t₁             (rₜ 𝓋 t₂ [] ∷ xs)             ∎
 
-  realize-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒮 .carrier) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
-    (φ : Formulaₙ l) (xs : Vec (𝒮 .carrier) l)
+module Pre (𝒾 : Interpretation) where
+  open Preₜ 𝒾 public
+  open ↔-Reasoning
+
+  realize-cong : ∀ {l} (𝓋 𝓊 : ℕ → 𝒾 .domain) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
+    (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l)
     → r 𝓋 φ xs ↔ r 𝓊 φ xs
   realize-cong 𝓋 𝓊 ext ⊥           xs = id
   realize-cong 𝓋 𝓊 ext (rel R)     xs = id
@@ -84,8 +88,8 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
   realize-cong 𝓋 𝓊 ext (∀' φ) xs = ∀-cong $ λ x
     → realize-cong (𝓋 [ x / 0 ]ᵥ) (𝓊 [ x / 0 ]ᵥ) (/ᵥ-cong ext x 0) φ xs
 
-  realize-subst : ∀ {l} (𝓋 : ℕ → 𝒮 .carrier) (n : ℕ) (φ : Formulaₙ l)
-    (s : Term) (xs : Vec (𝒮 .carrier) l)
+  realize-subst : ∀ {l} (𝓋 : ℕ → 𝒾 .domain) (n : ℕ) (φ : Formulaₙ l)
+    (s : Term) (xs : Vec (𝒾 .domain) l)
     → r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) φ xs ↔ r 𝓋 (φ [ s / n ]) xs
   realize-subst 𝓋 n ⊥          s xs = id
   realize-subst 𝓋 n (rel r₁)   s xs = id
@@ -108,9 +112,30 @@ module PreRealizationLemmas (𝒮 : Structure σ) where
         𝓋₃ = 𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ [ x / 0 ]ᵥ
         𝓋≡₂ : ∀ m → 𝓋₃ m ≡ 𝓋₂ m
         𝓋≡₂ m = sym $ cong (λ t → (𝓋 [ t / n ]ᵥ [ x / 0 ]ᵥ) m) (realizeₜ-subst-lift 𝓋 0 (s ↑ n) x [])
-    in begin↔
+    in begin
     r 𝓋₃ φ xs                             ≈⟨ realize-cong _ _ 𝓋≡₂ φ xs ⟩
     r 𝓋₂ φ xs                             ≈⟨ realize-cong _ _ 𝓋≡₁ φ xs ⟩
     r 𝓋₁ φ xs                             ≈⟨ realize-cong _ _ (//ᵥ 𝓋 x t₁ 0 n) φ xs ⟩
     r (𝓋 [ x / 0 ]ᵥ [ t₁ / suc n ]ᵥ) φ xs ≈⟨ realize-subst (𝓋 [ x / 0 ]ᵥ) (suc n) φ s xs ⟩
-    r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs ∎↔
+    r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs ∎
+
+  realize-subst-lift : ∀ {l} (𝓋 : ℕ → 𝒾 .domain) (n : ℕ)
+    (φ : Formulaₙ l) (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
+    → r (𝓋 [ x / n ]ᵥ) (φ ↥[ n ] 1) xs ↔ r 𝓋 φ xs
+  realize-subst-lift 𝓋 n ⊥ x xs        = id
+  realize-subst-lift 𝓋 n (rel r₁) x xs = id
+  realize-subst-lift 𝓋 n (appᵣ φ t) x xs
+    rewrite realizeₜ-subst-lift 𝓋 n t x [] = realize-subst-lift 𝓋 n φ x _
+  realize-subst-lift 𝓋 n (t₁ ≈ t₂) x xs
+    rewrite realizeₜ-subst-lift 𝓋 n t₁ x xs
+          | realizeₜ-subst-lift 𝓋 n t₂ x xs = id
+  realize-subst-lift 𝓋 n (φ₁ ⇒ φ₂) x xs =
+    →-cong (realize-subst-lift 𝓋 n φ₁ x xs) (realize-subst-lift 𝓋 n φ₂ x xs)
+  realize-subst-lift 𝓋 n (∀' φ) x xs = ∀-cong $ λ y →   begin
+    r (𝓋 [ x / n ]ᵥ [ y / 0 ]ᵥ)     (φ ↥[ suc n ] 1) xs ≈⟨ realize-cong _ _ (//ᵥ 𝓋 y x 0 n) (φ ↥[ suc n ] 1) xs ⟩
+    r (𝓋 [ y / 0 ]ᵥ [ x / suc n ]ᵥ) (φ ↥[ suc n ] 1) xs ≈⟨ realize-subst-lift (𝓋 [ y / 0 ]ᵥ) (suc n) φ x xs ⟩
+    r (𝓋 [ y / 0 ]ᵥ) φ xs                               ∎
+
+--realizeₜ-cong : ∀ (𝒾 𝒿 : Interpretation) (ext : ∀ n → 𝒾 .valuation n ≡ 𝒿 .valuation n) (t : Term)
+--  → realizeₜ 𝒾 t ≡ realizeₜ 𝒿 t
+--realizeₜ-cong 𝒾 𝒿 ext t = ?

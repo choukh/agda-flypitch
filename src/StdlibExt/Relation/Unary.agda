@@ -5,7 +5,7 @@ module StdlibExt.Relation.Unary where
 open import Level using (Level; _⊔_)
 open import Data.Product using (_×_; _,_; ∃-syntax)
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Unary using (Pred; _∈_; _⊆_; ｛_｝; _∪_)
 
 infixl 6 _⨭_

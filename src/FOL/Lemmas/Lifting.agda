@@ -9,7 +9,7 @@ open import Data.Nat.Properties
 open import Data.Empty using (⊥-elim)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
-open import Relation.Binary.PropositionalEquality.Core using (_≡_; refl; trans; cong)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; cong)
 
 ↑[]↑[] : ∀ {l} (t : Termₙ l) (n₁ m₁ n₂ m₂ : ℕ) → m₁ ≤ m₂ → m₂ ≤ m₁ + n₁
   → (t ↑[ m₁ ] n₁) ↑[ m₂ ] n₂ ≡ t ↑[ m₁ ] (n₁ + n₂)

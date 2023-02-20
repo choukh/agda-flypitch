@@ -7,9 +7,11 @@ open import Function using (_$_)
 open import Function.Equality using (_⟨$⟩_) public
 open import Function.Equivalence
   renaming (_⇔_ to _↔_; ⇔-setoid to ↔-setoid; equivalence to mk↔) public
-open import Relation.Binary.Reasoning.Setoid (↔-setoid u)
-  using (begin_; step-≈; step-≈˘; _∎) public
 open Equivalence public
+
+module ↔-Reasoning where
+  open import Relation.Binary.Reasoning.Setoid (↔-setoid u)
+    using (begin_; step-≡; step-≡˘; step-≈; step-≈˘; _∎) public
 
 private variable
   a b c d : Level

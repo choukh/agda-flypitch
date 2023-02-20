@@ -19,10 +19,11 @@ open import FOL.Lemmas.Realization (σ)
 open import Level using (lift)
 open import Data.Nat using (ℕ)
 open import Data.Sum using (inj₁; inj₂)
+open import Data.Product using (_×_; _,_)
 open import Function using (_∘_)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Nullary using (Dec)
-open import Relation.Binary.PropositionalEquality.Core using (refl)
+open import Relation.Binary.PropositionalEquality using (refl)
 open import StdlibExt.Classical using (byContra)
 ```
 
@@ -32,15 +33,16 @@ postulate
 
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
 soundness (axiom φ∈Γ) 𝒾 v = v _ φ∈Γ
-soundness {Γ} {φ} (⊥-elim ⊢⊥) 𝒾 v = byContra (dec 𝒾 φ) λ ¬ → soundness ⊢⊥ 𝒾
+soundness {Γ} {φ} (⊥-elim ⊢₀) 𝒾 v = byContra (dec 𝒾 φ) λ ¬ → soundness ⊢₀ 𝒾
   λ { φ₁ (inj₁ φ∈Γ)  → v φ₁ φ∈Γ
     ; φ₁ (inj₂ refl) → lift ∘ ¬ }
 soundness (≈-refl _ t)    𝒾 v = refl
-soundness (⇒-intro ⊢₂)    𝒾 v r = soundness ⊢₂ 𝒾
+soundness (⇒-intro ⊢₀)    𝒾 v r = soundness ⊢₀ 𝒾
   λ { φ (inj₁ φ∈Γ)  → v φ φ∈Γ
     ; φ (inj₂ refl) → r }
 soundness (⇒-elim ⊢₁ ⊢₂)  𝒾 v = (soundness ⊢₁ 𝒾 v) (soundness ⊢₂ 𝒾 v)
-soundness (∀-intro ⊢)     𝒾 v = {!   !}
+soundness (∀-intro ⊢₀)    𝒾 v = λ x → soundness ⊢₀ _
+  λ { φ (ψ , ψ∈Γ , refl) → {!   !}}
 soundness (∀-elim ⊢)      𝒾 v = {!   !}
 soundness (subst ⊢₁ ⊢₂)   𝒾 v = {!   !}
 ```

@@ -5,7 +5,7 @@ module StdlibExt.Data.Nat.Properties where
 open import Data.Nat
 open import Data.Nat.Properties public
 open import Function using (_$_)
-open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; sym; trans)
+open import Relation.Binary.PropositionalEquality as Eq using (_≡_; sym; trans)
 open ≤-Reasoning
 
 private variable
