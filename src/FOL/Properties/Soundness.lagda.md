@@ -10,11 +10,14 @@ zhihu-tags: Agda, 数理逻辑
 > 高亮渲染: [Soundness.html](https://choukh.github.io/agda-flypitch/FOL.Properties.Soundness.html)  
 
 ```agda
+{-# OPTIONS --cubical-compatible --safe #-}
+
 open import FOL.Signature
 module FOL.Properties.Soundness {u} (σ : Signature {u}) where
 open import FOL.Base (σ)
-open import FOL.Realization (σ)
+open import FOL.Interpretation (σ)
 open import FOL.Lemmas.Realization (σ)
+open Realizer
 
 open import Level using (lift)
 open import Data.Nat using (ℕ)
@@ -22,27 +25,27 @@ open import Data.Sum using (inj₁; inj₂)
 open import Data.Product using (_×_; _,_)
 open import Function using (_∘_)
 open import Relation.Unary using (Pred; _∈_)
-open import Relation.Nullary using (Dec)
 open import Relation.Binary.PropositionalEquality using (refl)
-open import StdlibExt.Classical using (byContra)
+open import StdlibExt.Relation.Nullary
+open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_)
 ```
 
 ```agda
-postulate
-  dec : ∀ 𝒾 φ → Dec (realize 𝒾 φ)
+dec : ∀ 𝒾 𝓋 φ → Dec (realize 𝒾 𝓋 φ)
+dec 𝒾 𝓋 φ = {!   !}
 
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
-soundness (axiom φ∈Γ) 𝒾 v = v _ φ∈Γ
-soundness {Γ} {φ} (⊥-elim ⊢₀) 𝒾 v = byContra (dec 𝒾 φ) λ ¬ → soundness ⊢₀ 𝒾
+soundness (axiom φ∈Γ) 𝒾 𝓋 v = v _ φ∈Γ
+soundness {Γ} {φ} (⊥-elim ⊢₀) 𝒾 𝓋 v = byContra (dec 𝒾 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒾 𝓋
   λ { φ₁ (inj₁ φ∈Γ)  → v φ₁ φ∈Γ
     ; φ₁ (inj₂ refl) → lift ∘ ¬ }
-soundness (≈-refl _ t)    𝒾 v = refl
-soundness (⇒-intro ⊢₀)    𝒾 v r = soundness ⊢₀ 𝒾
+soundness (≈-refl _ t) 𝒾 𝓋 v = refl
+soundness (⇒-intro ⊢₀) 𝒾 𝓋 v r = soundness ⊢₀ 𝒾 𝓋
   λ { φ (inj₁ φ∈Γ)  → v φ φ∈Γ
     ; φ (inj₂ refl) → r }
-soundness (⇒-elim ⊢₁ ⊢₂)  𝒾 v = (soundness ⊢₁ 𝒾 v) (soundness ⊢₂ 𝒾 v)
-soundness (∀-intro ⊢₀)    𝒾 v = λ x → soundness ⊢₀ _
-  λ { φ (ψ , ψ∈Γ , refl) → {!   !}}
-soundness (∀-elim ⊢)      𝒾 v = {!   !}
-soundness (subst ⊢₁ ⊢₂)   𝒾 v = {!   !}
+soundness (⇒-elim ⊢₁ ⊢₂) 𝒾 𝓋 v = (soundness ⊢₁ 𝒾 𝓋 v) (soundness ⊢₂ 𝒾 𝓋 v)
+soundness (∀-intro ⊢₀) 𝒾 𝓋 v x = soundness ⊢₀ 𝒾 _
+  λ { φ (ψ , ψ∈Γ , refl) → from (realize-subst-lift 𝒾 𝓋 0 ψ x) ⟨$⟩ v ψ ψ∈Γ}
+soundness (∀-elim a) 𝒾 𝓋 v = {!   !}
+soundness (subst a a₁) 𝒾 𝓋 v = {!   !}
 ```

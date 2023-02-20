@@ -6,8 +6,8 @@ zhihu-tags: Agda, 数理逻辑
 # Agda一阶逻辑(3) 解释
 
 > 交流Q群: 893531731  
-> 本文源码: [Realization.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Realization.lagda.md)  
-> 高亮渲染: [Realization.html](https://choukh.github.io/agda-flypitch/FOL.Realization.html)  
+> 本文源码: [Interpretation.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Interpretation.lagda.md)  
+> 高亮渲染: [Interpretation.html](https://choukh.github.io/agda-flypitch/FOL.Interpretation.html)  
 
 ## 前言
 
@@ -15,7 +15,7 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Realization {u} (σ : Signature {u}) where
+module FOL.Interpretation {u} (σ : Signature {u}) where
 open import FOL.Base (σ)
 open Signature
 ```
@@ -23,10 +23,12 @@ open Signature
 ### 标准库依赖
 
 ```agda
-open import Level using (suc)
+open import Level
+open import Data.Bool
 open import Data.Empty.Polymorphic renaming (⊥ to False)
 open import Data.Nat using (ℕ)
 open import Data.Vec using (Vec; []; _∷_)
+open import Function using (_$_)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
 ```
@@ -40,7 +42,7 @@ record Interpretation : Set (suc u) where
   field
     domain : Set u
     funmap : ∀ {n} → σ .functions n → Vec domain n → domain
-    relmap : ∀ {n} → σ .relations n → Vec domain n → Set u
+    relmap : ∀ {n} → σ .relations n → Vec domain n → Bool
 
 open Interpretation
 
@@ -51,7 +53,7 @@ Valuation 𝒾 = ℕ → 𝒾 .domain
 ## 实现
 
 ```agda
-module PreRealization (𝒾 : Interpretation) where
+module PreRealizer (𝒾 : Interpretation) where
   open Termₙ
   open Formulaₙ
 
@@ -62,7 +64,7 @@ module PreRealization (𝒾 : Interpretation) where
 
   realize : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l) → Set u
   realize 𝓋 ⊥          xs = False
-  realize 𝓋 (rel r)    xs = 𝒾 .relmap r xs
+  realize 𝓋 (rel r)    xs = Lift _ $ T $ 𝒾 .relmap r xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
@@ -70,8 +72,8 @@ module PreRealization (𝒾 : Interpretation) where
 ```
 
 ```agda
-module _ (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
-  open PreRealization 𝒾 renaming (realizeₜ to rₜ; realize to r)
+module Realizer (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
+  open PreRealizer 𝒾 renaming (realizeₜ to rₜ; realize to r)
 
   realizeₜ : Term → 𝒾 .domain
   realizeₜ t = rₜ 𝓋 t []
@@ -86,6 +88,8 @@ module _ (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
 ## 可满足性
 
 ```agda
+open Realizer
+
 _⊨_ : Theory → Formula → Set (suc u)
 Γ ⊨ φ = ∀ 𝒾 𝓋 → valid 𝒾 𝓋 Γ → realize 𝒾 𝓋 φ
 ```
