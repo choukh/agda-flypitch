@@ -6,30 +6,38 @@ open import Level using (Level; _⊔_)
 open import Data.Product using (_×_; _,_; ∃-syntax)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Relation.Unary using (Pred; _∈_; _⊆_; ｛_｝; _∪_)
+open import Relation.Unary using (Pred; _∈_; _⊆_; ｛_｝; _∪_) public
+
+private variable
+  a b ℓ : Level
+  A : Set a
+  B : Set b
+  P Q : Pred A ℓ
+  x : A
+  f : A → B
 
 infixl 6 _⨭_
 
-_⨭_ : ∀ {u v} {A : Set u} (P : Pred A v) (a : A) → Pred A (u ⊔ v)
-P ⨭ a = P ∪ ｛ a ｝
+_⨭_ : ∀ {a} {A : Set a} (P : Pred A ℓ) (x : A) → Pred A (ℓ ⊔ a)
+P ⨭ x = P ∪ ｛ x ｝
 
-⊆⨭ : ∀ {u v} {A : Set u} {P : Pred A v} {a : A} → P ⊆ P ⨭ a
+⊆⨭ : P ⊆ P ⨭ x
 ⊆⨭ x∈P = inj₁ x∈P
 
-⨭⊆⨭ : ∀ {u v} {A : Set u} {P Q : Pred A v} {a : A} → P ⊆ Q → P ⨭ a ⊆ Q ⨭ a
+⨭⊆⨭ : P ⊆ Q → P ⨭ x ⊆ Q ⨭ x
 ⨭⊆⨭ P⊆Q (inj₁ x∈P)  = inj₁ (P⊆Q x∈P)
 ⨭⊆⨭ P⊆Q (inj₂ refl) = inj₂ refl
 
-_⟦_⟧ : ∀ {u v} {A : Set u} (f : A → A) (P : Pred A v) → Pred A (u ⊔ v)
+_⟦_⟧ : ∀ {a b} {A : Set a} {B : Set b} (f : A → B) (P : Pred A ℓ) → Pred B (ℓ ⊔ a ⊔ b)
 f ⟦ P ⟧ = λ y → ∃[ x ] x ∈ P × y ≡ f x
 
-⟦⟧⊆⟦⟧ : ∀ {u v} {A : Set u} {f : A → A} {P Q : Pred A v} → P ⊆ Q → f ⟦ P ⟧ ⊆ f ⟦ Q ⟧
+⟦⟧⊆⟦⟧ : P ⊆ Q → f ⟦ P ⟧ ⊆ f ⟦ Q ⟧
 ⟦⟧⊆⟦⟧ P⊆Q (x , x∈P , refl) = x , P⊆Q x∈P , refl
 
-⟦⨭⟧⊆ : ∀ {u v} {A : Set u} {f : A → A} {P : Pred A v} {a : A} → f ⟦ P ⨭ a ⟧ ⊆ f ⟦ P ⟧ ⨭ f a
+⟦⨭⟧⊆ : f ⟦ P ⨭ a ⟧ ⊆ f ⟦ P ⟧ ⨭ f a
 ⟦⨭⟧⊆ (x , inj₁ x∈P  , refl) = inj₁ (x , x∈P , refl)
 ⟦⨭⟧⊆ (x , inj₂ refl , refl) = inj₂ refl
 
-⊆⟦⨭⟧ : ∀ {u v} {A : Set u} {f : A → A} {P : Pred A v} {a : A} → f ⟦ P ⟧ ⨭ f a ⊆ f ⟦ P ⨭ a ⟧
+⊆⟦⨭⟧ : f ⟦ P ⟧ ⨭ f x ⊆ f ⟦ P ⨭ x ⟧
 ⊆⟦⨭⟧ (inj₁ (x , x∈P , refl)) = x , inj₁ x∈P , refl
-⊆⟦⨭⟧ {a = a} (inj₂ refl) = a , inj₂ refl , refl
+⊆⟦⨭⟧ {x = x} (inj₂ refl) = x , inj₂ refl , refl

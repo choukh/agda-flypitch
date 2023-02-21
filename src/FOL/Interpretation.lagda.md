@@ -16,7 +16,7 @@ zhihu-tags: Agda, 数理逻辑
 
 open import FOL.Signature
 module FOL.Interpretation {u} (σ : Signature {u}) where
-open import FOL.Base (σ) hiding (⊥-elim)
+open import FOL.Base σ hiding (⊥-elim)
 open Signature
 ```
 
@@ -60,15 +60,15 @@ Valuation 𝒾 = ℕ → 𝒾 .domain
 
 ```agda
 module PreRealizer (𝒾 : Interpretation) where
-  open Termₙ
-  open Formulaₙ
+  open Termₗ
+  open Formulaₗ
 
-  realizeₜ : ∀ {l} (𝓋 : Valuation 𝒾) (t : Termₙ l) (xs : Vec (𝒾 .domain) l) → 𝒾 .domain
+  realizeₜ : ∀ {l} (𝓋 : Valuation 𝒾) (t : Termₗ l) (xs : Vec (𝒾 .domain) l) → 𝒾 .domain
   realizeₜ 𝓋 (var k)     xs = 𝓋 k
   realizeₜ 𝓋 (func f)    xs = 𝒾 .funmap f xs
   realizeₜ 𝓋 (app t₁ t₂) xs = realizeₜ 𝓋 t₁ ((realizeₜ 𝓋 t₂ []) ∷ xs)
 
-  realize : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l) → Set u
+  realize : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Set u
   realize 𝓋 ⊥          xs = False
   realize 𝓋 (rel r)    xs = Lift _ $ T $ 𝒾 .relmap r xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
@@ -76,7 +76,7 @@ module PreRealizer (𝒾 : Interpretation) where
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
   realize 𝓋 (∀' φ)     xs = ∀ x → realize (𝓋 [ x / 0 ]ᵥ) φ xs
 
-  dec : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
+  dec : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
   dec 𝓋 ⊥ xs = no λ ()
   dec 𝓋 (rel r) xs with 𝒾 .relmap r xs
   ... | true  = yes tt

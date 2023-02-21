@@ -2,7 +2,7 @@
 
 open import FOL.Signature
 module FOL.Lemmas.Lifting {u} (σ : Signature {u}) where
-open import FOL.Base (σ) hiding (⊥-elim)
+open import FOL.Base σ hiding (⊥-elim)
 
 open import Data.Nat
 open import Data.Nat.Properties
@@ -11,12 +11,12 @@ open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; cong)
 
-↑0 : ∀ {l} (t : Termₙ l) → t ↑ 0 ≡ t
+↑0 : ∀ {l} (t : Termₗ l) → t ↑ 0 ≡ t
 ↑0 (var k)  = cong var (+-identityʳ k)
 ↑0 (func f) = refl
 ↑0 (app t₁ t₂) rewrite ↑0 t₁ | ↑0 t₂ = refl
 
-↑[]↑[] : ∀ {l} (t : Termₙ l) (n₁ m₁ n₂ m₂ : ℕ) → m₁ ≤ m₂ → m₂ ≤ m₁ + n₁
+↑[]↑[] : ∀ {l} (t : Termₗ l) (n₁ m₁ n₂ m₂ : ℕ) → m₁ ≤ m₂ → m₂ ≤ m₁ + n₁
   → (t ↑[ m₁ ] n₁) ↑[ m₂ ] n₂ ≡ t ↑[ m₁ ] (n₁ + n₂)
 ↑[]↑[] (var k) n₁ m₁ n₂ m₂ ≤₁ ≤₂ with k <? m₁
 ... | yes p with k <? m₂
@@ -30,12 +30,12 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; con
   rewrite ↑[]↑[] t₁ n₁ m₁ n₂ m₂ ≤₁ ≤₂
         | ↑[]↑[] t₂ n₁ m₁ n₂ m₂ ≤₁ ≤₂ = refl
 
-↑↑[] : ∀ {l} (t : Termₙ l) (n₁ n₂ m₂ : ℕ) → m₂ ≤ n₁
+↑↑[] : ∀ {l} (t : Termₗ l) (n₁ n₂ m₂ : ℕ) → m₂ ≤ n₁
   → (t ↑ n₁) ↑[ m₂ ] n₂ ≡ t ↑ (n₁ + n₂)
 ↑↑[] t n₁ n₂ m₂ ≤ = ↑[]↑[] t n₁ 0 n₂ m₂ z≤n ≤
 
-↑↑ : ∀ {l} (t : Termₙ l) (n₁ n₂ : ℕ) → (t ↑ n₁) ↑ n₂ ≡ t ↑ (n₁ + n₂)
+↑↑ : ∀ {l} (t : Termₗ l) (n₁ n₂ : ℕ) → (t ↑ n₁) ↑ n₂ ≡ t ↑ (n₁ + n₂)
 ↑↑ t n₁ n₂ = ↑↑[] t n₁ n₂ 0 z≤n
 
-↑↑˘ : ∀ {l} (t : Termₙ l) (n₁ n₂ : ℕ) → (t ↑ n₁) ↑ n₂ ≡ t ↑ (n₂ + n₁)
+↑↑˘ : ∀ {l} (t : Termₗ l) (n₁ n₂ : ℕ) → (t ↑ n₁) ↑ n₂ ≡ t ↑ (n₂ + n₁)
 ↑↑˘ t n₁ n₂ = trans (↑↑ t n₁ n₂) (cong (t ↑_) (+-comm n₁ n₂))

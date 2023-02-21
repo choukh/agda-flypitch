@@ -4,10 +4,10 @@ open import FOL.Signature
 open import FOL.Interpretation using (Interpretation)
 module FOL.Lemmas.Realization {u} (σ : Signature {u}) (𝒾 : Interpretation σ) where
 
-open import FOL.Base (σ) hiding (⊥-elim; subst)
-open import FOL.Lemmas.Lifting (σ)
-open import FOL.Lemmas.Substitution (σ)
-open import FOL.Interpretation (σ)
+open import FOL.Base σ hiding (⊥-elim; subst)
+open import FOL.Lemmas.Lifting σ
+open import FOL.Lemmas.Substitution σ
+open import FOL.Interpretation σ
 open FOL.Interpretation.Interpretation
 
 open import Data.Nat
@@ -27,7 +27,7 @@ module Preₜ where
   open Eq.≡-Reasoning
 
   realizeₜ-cong : ∀ {l} (𝓋 𝓊 : Valuation 𝒾) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
-    (t : Termₙ l) (xs : Vec (𝒾 .domain) l)
+    (t : Termₗ l) (xs : Vec (𝒾 .domain) l)
     → rₜ 𝓋 t xs ≡ rₜ 𝓊 t xs
   realizeₜ-cong 𝓋 𝓊 ext (var k)     xs = ext k
   realizeₜ-cong 𝓋 𝓊 ext (func f)    xs = refl
@@ -35,7 +35,7 @@ module Preₜ where
     rewrite realizeₜ-cong 𝓋 𝓊 ext t₂ []
     rewrite realizeₜ-cong 𝓋 𝓊 ext t₁ (rₜ 𝓊 t₂ [] ∷ xs) = refl
 
-  realizeₜ-subst : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (t : Termₙ l)
+  realizeₜ-subst : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (t : Termₗ l)
     (s : Term) (xs : Vec (𝒾 .domain) l)
     → rₜ (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) t xs ≡ rₜ 𝓋 (t [ s / n ]ₜ) xs
   realizeₜ-subst 𝓋 n (var k) s xs with <-cmp k n
@@ -49,7 +49,7 @@ module Preₜ where
     rₜ 𝓋' t₁             (rₜ 𝓋 (t₂ [ s / n ]ₜ) [] ∷ xs) ≡⟨ realizeₜ-subst 𝓋 n t₁ s _ ⟩
     rₜ 𝓋 (t₁ [ s / n ]ₜ) (rₜ 𝓋 (t₂ [ s / n ]ₜ) [] ∷ xs) ∎
 
-  realizeₜ-subst-lift : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (t : Termₙ l)
+  realizeₜ-subst-lift : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (t : Termₗ l)
     (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
     → rₜ (𝓋 [ x / n ]ᵥ) (t ↑[ n ] 1) xs ≡ rₜ 𝓋 t xs
   realizeₜ-subst-lift 𝓋 n (var k) x xs with <-cmp k n | k <? n
@@ -75,7 +75,7 @@ module Pre where
   open Eqv.↔-Reasoning
 
   realize-cong : ∀ {l} (𝓋 𝓊 : Valuation 𝒾) (ext : ∀ n → 𝓋 n ≡ 𝓊 n)
-    (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l)
+    (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l)
     → r 𝓋 φ xs ↔ r 𝓊 φ xs
   realize-cong 𝓋 𝓊 ext ⊥           xs = id
   realize-cong 𝓋 𝓊 ext (rel R)     xs = id
@@ -89,7 +89,7 @@ module Pre where
   realize-cong 𝓋 𝓊 ext (∀' φ) xs = ∀-cong $ λ x
     → realize-cong (𝓋 [ x / 0 ]ᵥ) (𝓊 [ x / 0 ]ᵥ) (/ᵥ-cong ext x 0) φ xs
 
-  realize-subst : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (φ : Formulaₙ l)
+  realize-subst : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ) (φ : Formulaₗ l)
     (s : Term) (xs : Vec (𝒾 .domain) l)
     → r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) φ xs ↔ r 𝓋 (φ [ s / n ]) xs
   realize-subst 𝓋 n ⊥          s xs = id
@@ -121,7 +121,7 @@ module Pre where
     r (𝓋 [ x / 0 ]ᵥ) (φ [ s / suc n ]) xs ∎
 
   realize-subst-lift : ∀ {l} (𝓋 : Valuation 𝒾) (n : ℕ)
-    (φ : Formulaₙ l) (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
+    (φ : Formulaₗ l) (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
     → r (𝓋 [ x / n ]ᵥ) (φ ↥[ n ] 1) xs ↔ r 𝓋 φ xs
   realize-subst-lift 𝓋 n ⊥ x xs        = id
   realize-subst-lift 𝓋 n (rel r₁) x xs = id

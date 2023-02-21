@@ -14,9 +14,9 @@ zhihu-tags: Agda, 数理逻辑
 
 open import FOL.Signature
 module FOL.Properties.Soundness {u} (σ : Signature {u}) where
-open import FOL.Base (σ)
-open import FOL.Interpretation (σ)
-open import FOL.Lemmas.Realization (σ)
+open import FOL.Base σ
+open import FOL.Interpretation σ
+open import FOL.Lemmas.Realization σ
 open Interpretation
 open Realizer
 

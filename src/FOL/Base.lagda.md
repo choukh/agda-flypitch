@@ -34,7 +34,6 @@ open import Data.Sum using (inj₁; inj₂)
 open import Data.Vec using (Vec; []; _∷_)
 open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
-open import Relation.Unary using (Pred; _∈_; _⊆_)
 open import Relation.Binary using (tri<; tri≈; tri>)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import StdlibExt.Relation.Unary renaming (_⨭_ to _,_; ⨭⊆⨭ to ,⊆,; ⊆⨭ to ⊆,; ⊆⟦⨭⟧ to ⊆⟦,⟧)
@@ -68,12 +67,31 @@ infix 4 _⊢_
 特别地，`0`-项简称项。
 
 ```agda
-data Termₙ : ℕ → Set u where
-  var  : ∀ (k : ℕ) → Termₙ 0
-  func : ∀ {l} (f : σ .functions l) → Termₙ l
-  app  : ∀ {l} (t₁ : Termₙ (suc l)) (t₂ : Termₙ 0) → Termₙ l
+data Termₗ : ℕ → Set u where
+  var  : ∀ (k : ℕ) → Termₗ 0
+  func : ∀ {l} (f : σ .functions l) → Termₗ l
+  app  : ∀ {l} (t₁ : Termₗ (suc l)) (t₂ : Termₗ 0) → Termₗ l
 
-Term = Termₙ 0
+Term = Termₗ 0
+```
+
+由构造子的单射性立即有
+
+```agda
+var-injective : ∀ {k₁ k₂} → var k₁ ≡ var k₂ → k₁ ≡ k₂
+var-injective refl = refl
+```
+
+这意味着对任意两个变量如果它们相等, 那么它们所使用的自然数相等. 类似地有
+
+```agda
+app-injectiveˡ : ∀ {l} {t₁ t₂ : Termₗ (suc l)} {t₃ t₄ : Term}
+  → app t₁ t₃ ≡ app t₂ t₄ → t₁ ≡ t₂
+app-injectiveˡ refl = refl
+
+app-injectiveʳ : ∀ {l} {t₁ t₂ : Termₗ (suc l)} {t₃ t₄ : Term}
+  → app t₁ t₃ ≡ app t₂ t₄ → t₃ ≡ t₄
+app-injectiveʳ refl = refl
 ```
 
 ## 公式
@@ -109,15 +127,15 @@ n元关系在公式中的处理与n元函数在项中的处理类似, 我们把�
 特别地, `0`-公式简称公式.
 
 ```agda
-data Formulaₙ : ℕ → Set u where
-  ⊥     : Formulaₙ 0
-  rel   : ∀ {l} (r : σ .relations l) → Formulaₙ l
-  appᵣ  : ∀ {l} (φ : Formulaₙ (suc l)) (t : Term) → Formulaₙ l
-  _≈_   : ∀ (t₁ t₂ : Term) → Formulaₙ 0
-  _⇒_   : ∀ (φ₁ φ₂ : Formulaₙ 0) → Formulaₙ 0
-  ∀'_   : ∀ (φ : Formulaₙ 0) → Formulaₙ 0
+data Formulaₗ : ℕ → Set u where
+  ⊥     : Formulaₗ 0
+  rel   : ∀ {l} (r : σ .relations l) → Formulaₗ l
+  appᵣ  : ∀ {l} (φ : Formulaₗ (suc l)) (t : Term) → Formulaₗ l
+  _≈_   : ∀ (t₁ t₂ : Term) → Formulaₗ 0
+  _⇒_   : ∀ (φ₁ φ₂ : Formulaₗ 0) → Formulaₗ 0
+  ∀'_   : ∀ (φ : Formulaₗ 0) → Formulaₗ 0
 
-Formula = Formulaₙ 0
+Formula = Formulaₗ 0
 ```
 
 **注意** 我们将元数编码进类型里是为了省去所谓的[合式公式 (well-formed formula，WFF)](https://zh.wikipedia.org/wiki/%E5%90%88%E5%BC%8F%E5%85%AC%E5%BC%8F) 谓词. 任意 `φ : Formula` 都是合式公式, 类型正确性保证了 `φ` 的合式性.
@@ -162,21 +180,21 @@ _⇔_ : Formula → Formula → Formula
 特别地, 如果 `m = 0`, 就叫做将 `t` 提升 `n`, 记作 `t ↑ n`.
 
 ```agda
-_↑[_]_ : ∀ {l} (t : Termₙ l) (m n : ℕ) → Termₙ l
+_↑[_]_ : ∀ {l} (t : Termₗ l) (m n : ℕ) → Termₗ l
 var k     ↑[ m ] n with k <? m
 ... | yes _ = var k
 ... | no  _ = var (k + n)
 func f    ↑[ m ] n = func f
 app t₁ t₂ ↑[ m ] n = app (t₁ ↑[ m ] n) (t₂ ↑[ m ] n)
 
-_↑_ : ∀ {l} (t : Termₙ l) (n : ℕ) → Termₙ l
+_↑_ : ∀ {l} (t : Termₗ l) (n : ℕ) → Termₗ l
 t ↑ n = t ↑[ 0 ] n
 ```
 
 对公式的变量提升基本上就是对其中的项进行变量提升, 或者是对公式中的公式递归地提升. 只是对于量词构造的公式, 保留一位变量不提升, 以作为量词的绑定变量.
 
 ```agda
-_↥[_]_ : ∀ {l} (φ : Formulaₙ l) (m n : ℕ) → Formulaₙ l
+_↥[_]_ : ∀ {l} (φ : Formulaₗ l) (m n : ℕ) → Formulaₗ l
 ⊥         ↥[ m ] n = ⊥
 rel R     ↥[ m ] n = rel R
 appᵣ φ t  ↥[ m ] n = appᵣ (φ ↥[ m ] n) (t ↑[ m ] n)
@@ -184,7 +202,7 @@ appᵣ φ t  ↥[ m ] n = appᵣ (φ ↥[ m ] n) (t ↑[ m ] n)
 (φ₁ ⇒ φ₂) ↥[ m ] n = φ₁ ↥[ m ] n ⇒ φ₂ ↥[ m ] n
 ∀' φ      ↥[ m ] n = ∀' (φ ↥[ suc m ] n)
 
-_↥_ : ∀ {l} (φ : Formulaₙ l) (n : ℕ) → Formulaₙ l
+_↥_ : ∀ {l} (φ : Formulaₗ l) (n : ℕ) → Formulaₗ l
 φ ↥ n = φ ↥[ 0 ] n
 ```
 
@@ -214,7 +232,7 @@ insert_into_at_ : ∀ {u} {T : Set u} (s : T) (v : ℕ → T) (n : ℕ) → (ℕ
 _[_/_]ᵥ : ∀ {u} {T : Set u} (v : ℕ → T) (s : T) (n : ℕ) → (ℕ → T)
 v [ s / n ]ᵥ = insert s into v at n
 
-_[_/_]ₜ : ∀ {l} (t : Termₙ l) (s : Term) (n : ℕ) → Termₙ l
+_[_/_]ₜ : ∀ {l} (t : Termₗ l) (s : Term) (n : ℕ) → Termₗ l
 var k     [ s / n ]ₜ = var [ (s ↑ n) / n ]ᵥ $ k
 func f    [ s / n ]ₜ = func f
 app t₁ t₂ [ s / n ]ₜ = app (t₁ [ s / n ]ₜ) (t₂ [ s / n ]ₜ)
@@ -223,7 +241,7 @@ app t₁ t₂ [ s / n ]ₜ = app (t₁ [ s / n ]ₜ) (t₂ [ s / n ]ₜ)
 对公式的变量替换基本上就是对其中的项进行变量替换, 或者是对公式中的公式递归地替换. 只是对于量词构造的公式, 将替换的位置顺延一位, 因为首位是量词的绑定变量.
 
 ```agda
-_[_/_] : ∀ {l} (φ : Formulaₙ l) (s : Term) (n : ℕ) → Formulaₙ l
+_[_/_] : ∀ {l} (φ : Formulaₗ l) (s : Term) (n : ℕ) → Formulaₗ l
 ⊥         [ s / n ] = ⊥
 rel R     [ s / n ] = rel R
 appᵣ φ t  [ s / n ] = appᵣ (φ [ s / n ]) (t [ s / n ]ₜ)
@@ -302,7 +320,7 @@ weakening Γ⊆Δ (subst ⊢₁ ⊢₂)   = subst   (weakening Γ⊆Δ ⊢₁) (
 weakening1 : ∀ {Γ φ₁ φ₂} → Γ ⊢ φ₂ → Γ , φ₁ ⊢ φ₂
 weakening1 = weakening ⊆,
 
-weakening2 : ∀ {Γ φ₁ φ₂ φ₃} → Γ , φ₁ ⊢ φ₂ → Γ , φ₃ , φ₁ ⊢ φ₂
+weakening2 : ∀ {Γ : Theory} {φ₁ φ₂ φ₃} → Γ , φ₁ ⊢ φ₂ → Γ , φ₃ , φ₁ ⊢ φ₂
 weakening2 = weakening (,⊆, ⊆,)
 ```
 

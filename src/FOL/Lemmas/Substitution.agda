@@ -2,7 +2,7 @@
 
 open import FOL.Signature
 module FOL.Lemmas.Substitution {u} (σ : Signature {u}) where
-open import FOL.Base (σ) hiding (⊥-elim; subst)
+open import FOL.Base σ hiding (⊥-elim; subst)
 
 open import Data.Nat
 open import Data.Empty using (⊥-elim)
