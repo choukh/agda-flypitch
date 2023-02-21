@@ -24,26 +24,28 @@ open import Level using (lift)
 open import Data.Nat using (ℕ)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Product using (_×_; _,_)
-open import Function using (_∘_)
+open import Function using (_∘_; _$_)
 open import Relation.Unary using (Pred; _∈_)
-open import Relation.Binary.PropositionalEquality using (refl)
+open import Relation.Binary.PropositionalEquality using (refl; sym)
 open import StdlibExt.Relation.Nullary
-open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_)
+open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_; sym)
 ```
 
 ```agda
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
-soundness (axiom φ∈Γ) 𝒾 𝓋 v = v _ φ∈Γ
-soundness {Γ} {φ} (⊥-elim ⊢₀) 𝒾 𝓋 v = byContra (dec 𝒾 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒾 𝓋
+soundness (axiom φ∈Γ) _ _ v = v _ φ∈Γ
+soundness {_} {φ} (⊥-elim ⊢₀) 𝒾 𝓋 v = byContra (dec 𝒾 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒾 𝓋
   λ { φ₁ (inj₁ φ∈Γ)  → v φ₁ φ∈Γ
     ; φ₁ (inj₂ refl) → lift ∘ ¬ }
-soundness (≈-refl _ t) 𝒾 𝓋 v = refl
+soundness (≈-refl _ t) _ _ _ = refl
 soundness (⇒-intro ⊢₀) 𝒾 𝓋 v r = soundness ⊢₀ 𝒾 𝓋
   λ { φ (inj₁ φ∈Γ)  → v φ φ∈Γ
     ; φ (inj₂ refl) → r }
 soundness (⇒-elim ⊢₁ ⊢₂) 𝒾 𝓋 v = (soundness ⊢₁ 𝒾 𝓋 v) (soundness ⊢₂ 𝒾 𝓋 v)
 soundness (∀-intro ⊢₀) 𝒾 𝓋 v x = soundness ⊢₀ 𝒾 _
-  λ { φ (ψ , ψ∈Γ , refl) → from (realize-subst-lift 𝒾 𝓋 0 ψ x) ⟨$⟩ v ψ ψ∈Γ}
-soundness (∀-elim a) 𝒾 𝓋 v = {!   !}
-soundness (subst a a₁) 𝒾 𝓋 v = {!   !}
+  λ { φ (ψ , ψ∈Γ , refl) → from (realize-subst-lift 𝒾 𝓋 0 ψ x) ⟨$⟩ v ψ ψ∈Γ }
+soundness (∀-elim {_} {φ} {t} ⊢₀) 𝒾 𝓋 v = to (realize-subst0 𝒾 𝓋 φ t) ⟨$⟩ soundness ⊢₀ 𝒾 𝓋 v _
+soundness (subst {_} {s} {t} {φ} ⊢₁ ⊢₂) 𝒾 𝓋 v = to (realize-subst0 𝒾 𝓋 φ t) ⟨$⟩ H where
+  H : realize 𝒾 (𝓋 [ realizeₜ 𝒾 𝓋 t / 0 ]ᵥ) φ
+  H rewrite sym $ soundness ⊢₁ 𝒾 𝓋 v = from (realize-subst0 𝒾 𝓋 φ s) ⟨$⟩ (soundness ⊢₂ 𝒾 𝓋 v)
 ```

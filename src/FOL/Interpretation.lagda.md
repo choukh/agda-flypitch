@@ -33,8 +33,8 @@ open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Binary using (Decidable)
-open import Relation.Binary.PropositionalEquality using (_≡_)
-open import Relation.Nullary using (Dec; yes; no)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)
+open import Relation.Nullary using (Dec; yes; no; ¬_)
 ```
 
 ## 解释 (结构)
@@ -45,7 +45,8 @@ open import Relation.Nullary using (Dec; yes; no)
 record Interpretation : Set (suc u) where
   field
     domain : Set u
-    dec-eq : Decidable {A = domain} _≡_
+    deceq : Decidable {A = domain} _≡_
+    compactness : ∀ (P : domain → Set u) → (∀ x → Dec (P x)) → Dec (∀ x → P x)
     funmap : ∀ {n} → σ .functions n → Vec domain n → domain
     relmap : ∀ {n} → σ .relations n → Vec domain n → Bool
 
@@ -75,18 +76,18 @@ module PreRealizer (𝒾 : Interpretation) where
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
   realize 𝓋 (∀' φ)     xs = ∀ x → realize (𝓋 [ x / 0 ]ᵥ) φ xs
 
-  dec : ∀ {l} 𝓋 φ (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
+  dec : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₙ l) (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
   dec 𝓋 ⊥ xs = no λ ()
   dec 𝓋 (rel r) xs with 𝒾 .relmap r xs
   ... | true  = yes tt
   ... | false = no λ ()
   dec 𝓋 (appᵣ φ t) xs = dec 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
-  dec 𝓋 (t₁ ≈ t₂) [] = 𝒾 .dec-eq (realizeₜ 𝓋 t₁ []) (realizeₜ 𝓋 t₂ [])
+  dec 𝓋 (t₁ ≈ t₂) [] = 𝒾 .deceq (realizeₜ 𝓋 t₁ []) (realizeₜ 𝓋 t₂ [])
   dec 𝓋 (φ₁ ⇒ φ₂) xs with dec 𝓋 φ₁ xs | dec 𝓋 φ₂ xs
   ... | _     | yes q = yes λ _ → q
   ... | yes p | no ¬q = no  λ p→q → ¬q $ p→q p
   ... | no ¬p | no _  = yes λ p → ⊥-elim $ ¬p p
-  dec 𝓋 (∀' φ) xs = {!   !}
+  dec 𝓋 (∀' φ) [] = 𝒾 .compactness _ (λ x → dec (𝓋 [ x / 0 ]ᵥ) φ [])
 ```
 
 ```agda

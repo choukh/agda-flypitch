@@ -162,3 +162,12 @@ realize-subst 𝓋 n φ s = Pre.realize-subst 𝓋 n φ s []
 realize-subst-lift : ∀ (𝓋 : Valuation 𝒾) (n : ℕ) (φ : Formula) (x : 𝒾 .domain)
   → realize (𝓋 [ x / n ]ᵥ) (φ ↥[ n ] 1) ↔ realize 𝓋 φ
 realize-subst-lift 𝓋 n φ x = Pre.realize-subst-lift 𝓋 n φ x []
+
+open Eqv.↔-Reasoning
+
+realize-subst0 : ∀ (𝓋 : Valuation 𝒾) (φ : Formula) (s : Term)
+  → realize (𝓋 [ realizeₜ 𝓋 s / 0 ]ᵥ) φ ↔ realize 𝓋 (φ [ s / 0 ])
+realize-subst0 𝓋 φ s =                      begin
+  realize (𝓋 [ realizeₜ 𝓋 s       / 0 ]ᵥ) φ ≡˘⟨ cong (λ s → realize (𝓋 [ realizeₜ 𝓋 s / 0 ]ᵥ) φ) (↑0 s) ⟩
+  realize (𝓋 [ realizeₜ 𝓋 (s ↑ 0) / 0 ]ᵥ) φ ≈⟨ realize-subst 𝓋 0 φ s ⟩
+  realize 𝓋 (φ [ s / 0 ])                   ∎
