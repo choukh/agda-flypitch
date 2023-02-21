@@ -70,7 +70,7 @@ module PreRealizer (𝒾 : Interpretation) where
 
   realize : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Set u
   realize 𝓋 ⊥          xs = False
-  realize 𝓋 (rel r)    xs = Lift _ $ T $ 𝒾 .relmap r xs
+  realize 𝓋 (rel R)    xs = Lift _ $ T $ 𝒾 .relmap R xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
@@ -78,7 +78,7 @@ module PreRealizer (𝒾 : Interpretation) where
 
   dec : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
   dec 𝓋 ⊥ xs = no λ ()
-  dec 𝓋 (rel r) xs with 𝒾 .relmap r xs
+  dec 𝓋 (rel R) xs with 𝒾 .relmap R xs
   ... | true  = yes tt
   ... | false = no λ ()
   dec 𝓋 (appᵣ φ t) xs = dec 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)

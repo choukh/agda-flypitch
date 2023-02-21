@@ -93,7 +93,7 @@ module Pre where
     (s : Term) (xs : Vec (𝒾 .domain) l)
     → r (𝓋 [ rₜ 𝓋 (s ↑ n) [] / n ]ᵥ) φ xs ↔ r 𝓋 (φ [ s / n ]) xs
   realize-subst 𝓋 n ⊥          s xs = id
-  realize-subst 𝓋 n (rel r₁)   s xs = id
+  realize-subst 𝓋 n (rel R₁)   s xs = id
   realize-subst 𝓋 n (appᵣ φ t) s xs
     rewrite realizeₜ-subst 𝓋 n t s [] = realize-subst 𝓋 n φ s _
   realize-subst 𝓋 n (t₁ ≈ t₂) s xs
@@ -124,7 +124,7 @@ module Pre where
     (φ : Formulaₗ l) (x : 𝒾 .domain) (xs : Vec (𝒾 .domain) l)
     → r (𝓋 [ x / n ]ᵥ) (φ ↥[ n ] 1) xs ↔ r 𝓋 φ xs
   realize-subst-lift 𝓋 n ⊥ x xs        = id
-  realize-subst-lift 𝓋 n (rel r₁) x xs = id
+  realize-subst-lift 𝓋 n (rel R₁) x xs = id
   realize-subst-lift 𝓋 n (appᵣ φ t) x xs
     rewrite realizeₜ-subst-lift 𝓋 n t x [] = realize-subst-lift 𝓋 n φ x _
   realize-subst-lift 𝓋 n (t₁ ≈ t₂) x xs

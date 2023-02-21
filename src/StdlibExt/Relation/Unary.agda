@@ -34,10 +34,19 @@ f ⟦ P ⟧ = λ y → ∃[ x ] x ∈ P × y ≡ f x
 ⟦⟧⊆⟦⟧ : P ⊆ Q → f ⟦ P ⟧ ⊆ f ⟦ Q ⟧
 ⟦⟧⊆⟦⟧ P⊆Q (x , x∈P , refl) = x , P⊆Q x∈P , refl
 
-⟦⨭⟧⊆ : f ⟦ P ⨭ a ⟧ ⊆ f ⟦ P ⟧ ⨭ f a
+⟦⨭⟧⊆ : f ⟦ P ⨭ x ⟧ ⊆ f ⟦ P ⟧ ⨭ f x
 ⟦⨭⟧⊆ (x , inj₁ x∈P  , refl) = inj₁ (x , x∈P , refl)
 ⟦⨭⟧⊆ (x , inj₂ refl , refl) = inj₂ refl
 
 ⊆⟦⨭⟧ : f ⟦ P ⟧ ⨭ f x ⊆ f ⟦ P ⨭ x ⟧
 ⊆⟦⨭⟧ (inj₁ (x , x∈P , refl)) = x , inj₁ x∈P , refl
 ⊆⟦⨭⟧ {x = x} (inj₂ refl) = x , inj₂ refl , refl
+
+_⟦｛_｝⟧ : ∀ {a b} {A : Set a} {B : Set b} (f : A → B) (x : A) → Pred B (a ⊔ b)
+f ⟦｛ x ｝⟧ = f ⟦ ｛ x ｝ ⟧
+
+⟦｛｝⟧⊆ : f ⟦｛ x ｝⟧ ⊆ ｛ f x ｝
+⟦｛｝⟧⊆ (x , refl , refl) = refl
+
+⊆⟦｛｝⟧ : ｛ f x ｝ ⊆ f ⟦｛ x ｝⟧
+⊆⟦｛｝⟧ {x = x} refl = x , refl , refl
