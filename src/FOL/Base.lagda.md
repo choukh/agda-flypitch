@@ -36,7 +36,7 @@ open import Function using (_$_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Binary using (tri<; tri≈; tri>)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import StdlibExt.Relation.Unary renaming (_⨭_ to _,_; ⨭⊆⨭ to ,⊆,; ⊆⨭ to ⊆,; ⊆⟦⨭⟧ to ⊆⟦,⟧)
+open import StdlibExt.Relation.Unary.Pred renaming (_⨭_ to _,_; ⨭⊆⨭ to ,⊆,; ⊆⨭ to ⊆,; ⊆⟦⨭⟧ to ⊆⟦,⟧)
 ```
 
 ### 符号优先级

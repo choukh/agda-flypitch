@@ -1,8 +1,9 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-module StdlibExt.Relation.Unary where
+module StdlibExt.Relation.Unary.Pred where
 
-open import Level using (Level; _⊔_)
+open import Level
+open import Data.Empty.Polymorphic using (⊥)
 open import Data.Product using (_×_; _,_; ∃-syntax)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -17,6 +18,9 @@ private variable
   f : A → B
 
 infixl 6 _⨭_
+
+∅ : Pred A ℓ
+∅ = λ _ → ⊥
 
 _⨭_ : ∀ {a} {A : Set a} (P : Pred A ℓ) (x : A) → Pred A (ℓ ⊔ a)
 P ⨭ x = P ∪ ｛ x ｝

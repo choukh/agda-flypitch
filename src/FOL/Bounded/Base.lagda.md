@@ -36,7 +36,7 @@ open import Data.Sum using (inj₁; inj₂)
 open import Data.Product using (_,_)
 open import Function using (_$_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
-open import StdlibExt.Relation.Unary
+open import StdlibExt.Relation.Unary.Pred
 ```
 
 ### 符号优先级
