@@ -224,6 +224,19 @@ tauto-exfalso = Free.tauto-exfalso
 
 ∨-elim : ∀ {Γ φ₁ φ₂ φ₃} → Γ ⊢ φ₁ ∨ φ₂ → Γ ⨭ φ₁ ⊢ φ₃ → Γ ⨭ φ₂ ⊢ φ₃ → Γ ⊢ φ₃
 ∨-elim Γ⊢∨ ⊢₁ ⊢₂ = Free.∨-elim Γ⊢∨ (bound⊢ ⊢₁) (bound⊢ ⊢₂)
+
+∨-comm : ∀ {Γ φ₁ φ₂} → Γ ⊢ φ₁ ∨ φ₂ → Γ ⊢ φ₂ ∨ φ₁
+∨-comm = Free.∨-comm
+```
+
+### 排中律
+
+```agda
+LEM : ∀ {Γ φ} → Γ ⊢ φ ∨ ~ φ
+LEM = Free.LEM
+
+DNE : ∀ {Γ φ} → Γ ⊢ ~ ~ φ ⇒ φ
+DNE = Free.DNE
 ```
 
 ### 矛盾律
@@ -264,16 +277,3 @@ tauto-no-contra = Free.tauto-no-contra
 ⇔-trans : ∀ {Γ φ₁ φ₂ φ₃} → Γ ⊢ φ₁ ⇔ φ₂ → Γ ⊢ φ₂ ⇔ φ₃ → Γ ⊢ φ₁ ⇔ φ₃
 ⇔-trans = Free.⇔-trans
 ```
-
-### `∃` 的引入引出规则
-
-∃-intro : ∀ {Γ φ} (t : Term) → Γ ⊢ φ [ t / 0 ] → Γ ⊢ ∃' φ
-∃-intro t ⊢ = ⇒-intro $ ⇒-elim (∀-elim axiom1) (weakening1 ⊢)
-
-∃-elim : ∀ {Γ φ₁ φ₂} → Γ ⊢ ∃' φ₁ → Γ ⇑ 1 , φ₁ ⊢ φ₂ ↥ 1 → Γ ⊢ φ₂
-∃-elim ⊢∃ ⊢ = ⊥-elim $ ⇒-elim
-  (weakening1 ⊢∃)
-  (∀-intro $ ⇒-intro $ ⇒-elim
-    (weakening1 $ weakening ⊆⟦,⟧ axiom1)
-    (weakening (,⊆, $ ⟦⟧⊆⟦⟧ ⊆,) ⊢)
-  )

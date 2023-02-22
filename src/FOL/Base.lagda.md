@@ -390,6 +390,19 @@ tauto-exfalso = ⇒-intro-tauto exfalso
 ∨-elim Γ⊢∨ ⊢₁ ⊢₂ = ⊥-elim $ ⇒-elim axiom1 Γ,φ₃⇒⊥⊢φ₃ where
   Γ,φ₃⇒⊥⊢φ₃ = ⇒-elim (⇒-intro $ weakening2 ⊢₂) Γ,φ₃⇒⊥⊢φ₂ where
     Γ,φ₃⇒⊥⊢φ₂ = ⇒-elim (weakening1 Γ⊢∨) (⇒-intro $ ⇒-elim axiom2 (weakening2 ⊢₁))
+
+∨-comm : ∀ {Γ φ₁ φ₂} → Γ ⊢ φ₁ ∨ φ₂ → Γ ⊢ φ₂ ∨ φ₁
+∨-comm ⊢∨ = ∨-elim ⊢∨ (∨-introᵣ axiom1) (∨-introₗ axiom1)
+```
+
+### 排中律
+
+```agda
+LEM : ∀ {Γ φ} → Γ ⊢ φ ∨ ~ φ
+LEM = ⇒-intro axiom1
+
+DNE : ∀ {Γ φ} → Γ ⊢ ~ ~ φ ⇒ φ
+DNE = ∨-comm LEM
 ```
 
 ### 矛盾律
