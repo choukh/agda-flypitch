@@ -1,9 +1,9 @@
 ---
-title: Agda一阶逻辑(5) 束缚
+title: Agda一阶逻辑(3) 束缚
 zhihu-tags: Agda, 数理逻辑
 ---
 
-# Agda一阶逻辑(5) 束缚
+# Agda一阶逻辑(3) 束缚
 
 > 交流Q群: 893531731  
 > 本文源码: [Base.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Bounded/Base.lagda.md)  
@@ -20,6 +20,7 @@ open Signature
 
 module FOL.Bounded.Base {u} (σ : Signature {u}) where
 import FOL.Base σ as Free
+open Free using (l) public
 open Free.Termₗ
 open Free.Formulaₗ
 open Free._⊢_
@@ -56,8 +57,8 @@ infix 4 _⊢_
 ```agda
 data Termₗ (n : ℕ) : ℕ → Set u where
   var  : ∀ (k : Fin n) → Termₗ n 0
-  func : ∀ {l} (f : σ .functions l) → Termₗ n l
-  app  : ∀ {l} (t₁ : Termₗ n (suc l)) (t₂ : Termₗ n 0) → Termₗ n l
+  func : ∀ (f : σ .functions l) → Termₗ n l
+  app  : ∀ (t₁ : Termₗ n (suc l)) (t₂ : Termₗ n 0) → Termₗ n l
 
 Term = λ n → Termₗ n 0
 ```
@@ -75,8 +76,8 @@ ClosedTerm = ClosedTermₗ 0
 ```agda
 data Formulaₗ (n : ℕ) : ℕ → Set u where
   ⊥     : Formulaₗ n 0
-  rel   : ∀ {l} (r : σ .relations l) → Formulaₗ n l
-  appᵣ  : ∀ {l} (φ : Formulaₗ n (suc l)) (t : Term n) → Formulaₗ n l
+  rel   : ∀ (R : σ .relations l) → Formulaₗ n l
+  appᵣ  : ∀ (φ : Formulaₗ n (suc l)) (t : Term n) → Formulaₗ n l
   _≈_   : ∀ (t₁ t₂ : Term n) → Formulaₗ n 0
   _⇒_   : ∀ (φ₁ φ₂ : Formulaₗ n 0) → Formulaₗ n 0
   ∀'_   : ∀ (φ : Formulaₗ (suc n) 0) → Formulaₗ n 0
@@ -101,36 +102,41 @@ Theory = Pred (Sentence) u
 ### 导出符号
 
 ```agda
-~_ : ∀ {n} → Formula n → Formula n
+variable
+  n : ℕ
+```
+
+```agda
+~_ : Formula n → Formula n
 ~ φ = φ ⇒ ⊥
 
 ⊤ : Sentence
 ⊤ = ~ ⊥
 
-_∧_ : ∀ {n} → Formula n → Formula n → Formula n
+_∧_ : Formula n → Formula n → Formula n
 φ₁ ∧ φ₂ = ~ (φ₁ ⇒ ~ φ₂)
 
-_∨_ : ∀ {n} → Formula n → Formula n → Formula n
+_∨_ : Formula n → Formula n → Formula n
 φ₁ ∨ φ₂ = ~ φ₁ ⇒ φ₂
 
-_⇔_ : ∀ {n} → Formula n → Formula n → Formula n
+_⇔_ : Formula n → Formula n → Formula n
 φ₁ ⇔ φ₂ = φ₁ ⇒ φ₂ ∧ φ₂ ⇒ φ₁
 
-∃'_ : ∀ {n} → Formula (suc n) → Formula n
+∃'_ : Formula (suc n) → Formula n
 ∃' φ = ~ (∀' ~ φ)
 ```
 
 ## 解束缚
 
 ```agda
-unboundₜ : ∀ {n l} → Termₗ n l → Free.Termₗ l
+unboundₜ : Termₗ n l → Free.Termₗ l
 unboundₜ (var k)     = var $ toℕ k
 unboundₜ (func f)    = func f
 unboundₜ (app t₁ t₂) = app (unboundₜ t₁) (unboundₜ t₂)
 ```
 
 ```agda
-unbound : ∀ {n l} → Formulaₗ n l → Free.Formulaₗ l
+unbound : Formulaₗ n l → Free.Formulaₗ l
 unbound ⊥           = ⊥
 unbound (rel R)     = rel R
 unbound (appᵣ φ t)  = appᵣ (unbound φ) (unboundₜ t)

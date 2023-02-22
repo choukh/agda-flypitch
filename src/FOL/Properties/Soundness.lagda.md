@@ -1,9 +1,9 @@
 ---
-title: Agda一阶逻辑(4) 可靠性
+title: Agda一阶逻辑(6) 可靠性
 zhihu-tags: Agda, 数理逻辑
 ---
 
-# Agda一阶逻辑(4) 可靠性
+# Agda一阶逻辑(6) 可靠性
 
 > 交流Q群: 893531731  
 > 本文源码: [Soundness.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Properties/Soundness.lagda.md)  
@@ -33,19 +33,19 @@ open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_; 
 
 ```agda
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
-soundness (axiom φ∈Γ) _ _ v = v _ φ∈Γ
-soundness {_} {φ} (⊥-elim ⊢₀) 𝒾 𝓋 v = byContra (dec 𝒾 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒾 𝓋
-  λ { φ₁ (inj₁ φ∈Γ)  → v φ₁ φ∈Γ
+soundness (axiom φ∈Γ) _ _ vld = vld _ φ∈Γ
+soundness {_} {φ} (⊥-elim ⊢₀) 𝒮 𝓋 vld = byContra (dec 𝒮 𝓋 φ) λ ¬ → soundness ⊢₀ 𝒮 𝓋
+  λ { φ₁ (inj₁ φ∈Γ)  → vld φ₁ φ∈Γ
     ; φ₁ (inj₂ refl) → lift ∘ ¬ }
 soundness (≈-refl _ t) _ _ _ = refl
-soundness (⇒-intro ⊢₀) 𝒾 𝓋 v r = soundness ⊢₀ 𝒾 𝓋
-  λ { φ (inj₁ φ∈Γ)  → v φ φ∈Γ
+soundness (⇒-intro ⊢₀) 𝒮 𝓋 vld r = soundness ⊢₀ 𝒮 𝓋
+  λ { φ (inj₁ φ∈Γ)  → vld φ φ∈Γ
     ; φ (inj₂ refl) → r }
-soundness (⇒-elim ⊢₁ ⊢₂) 𝒾 𝓋 v = (soundness ⊢₁ 𝒾 𝓋 v) (soundness ⊢₂ 𝒾 𝓋 v)
-soundness (∀-intro ⊢₀) 𝒾 𝓋 v x = soundness ⊢₀ 𝒾 _
-  λ { φ (ψ , ψ∈Γ , refl) → from (realize-subst-lift 𝒾 𝓋 0 ψ x) ⟨$⟩ v ψ ψ∈Γ }
-soundness (∀-elim {_} {φ} {t} ⊢₀) 𝒾 𝓋 v = to (realize-subst0 𝒾 𝓋 φ t) ⟨$⟩ soundness ⊢₀ 𝒾 𝓋 v _
-soundness (subst {_} {s} {t} {φ} ⊢₁ ⊢₂) 𝒾 𝓋 v = to (realize-subst0 𝒾 𝓋 φ t) ⟨$⟩ H where
-  H : realize 𝒾 (𝓋 [ realizeₜ 𝒾 𝓋 t / 0 ]ᵥ) φ
-  H rewrite sym $ soundness ⊢₁ 𝒾 𝓋 v = from (realize-subst0 𝒾 𝓋 φ s) ⟨$⟩ (soundness ⊢₂ 𝒾 𝓋 v)
+soundness (⇒-elim ⊢₁ ⊢₂) 𝒮 𝓋 vld = (soundness ⊢₁ 𝒮 𝓋 vld) (soundness ⊢₂ 𝒮 𝓋 vld)
+soundness (∀-intro ⊢₀) 𝒮 𝓋 vld x = soundness ⊢₀ 𝒮 _
+  λ { φ (ψ , ψ∈Γ , refl) → from (realize-subst-lift 𝒮 𝓋 0 ψ x) ⟨$⟩ vld ψ ψ∈Γ }
+soundness (∀-elim {_} {φ} {t} ⊢₀) 𝒮 𝓋 vld = to (realize-subst0 𝒮 𝓋 φ t) ⟨$⟩ soundness ⊢₀ 𝒮 𝓋 vld _
+soundness (subst {_} {s} {t} {φ} ⊢₁ ⊢₂) 𝒮 𝓋 vld = to (realize-subst0 𝒮 𝓋 φ t) ⟨$⟩ H where
+  H : realize 𝒮 (𝓋 [ realizeₜ 𝒮 𝓋 t / 0 ]ᵥ) φ
+  H rewrite sym $ soundness ⊢₁ 𝒮 𝓋 vld = from (realize-subst0 𝒮 𝓋 φ s) ⟨$⟩ (soundness ⊢₂ 𝒮 𝓋 vld)
 ```

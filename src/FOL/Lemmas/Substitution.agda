@@ -4,6 +4,7 @@ open import FOL.Signature
 module FOL.Lemmas.Substitution {u} (σ : Signature {u}) where
 open import FOL.Base σ hiding (⊥-elim; subst)
 
+open import Level using (Level)
 open import Data.Nat
 open import Data.Empty using (⊥-elim)
 open import Function using (_$_)
@@ -13,14 +14,18 @@ open import Relation.Binary.PropositionalEquality
   using (_≡_; refl; cong; sym; trans; subst)
 open import StdlibExt.Data.Nat.Properties
 
-/ᵥ-cong : ∀ {u} {T : Set u} {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
+private variable
+  ℓ : Level
+  T : Set ℓ
+
+/ᵥ-cong : ∀ {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
   → (𝓋 [ s / n ]ᵥ) k ≡ (𝓊 [ s / n ]ᵥ) k
 /ᵥ-cong ext s n k with <-cmp k n
 ... | tri< _ _ _ = ext k
 ... | tri≈ _ _ _ = refl
 ... | tri> _ _ _ = ext (k ∸ 1)
 
-//ᵥ : ∀ {u} {T : Set u} (𝓋 : ℕ → T) (s₁ s₂ : T) (n₁ n₂ k : ℕ)
+//ᵥ : ∀ (𝓋 : ℕ → T) (s₁ s₂ : T) (n₁ n₂ k : ℕ)
   → (𝓋 [ s₂ / n₁ + n₂ ]ᵥ [ s₁ / n₁ ]ᵥ) k ≡ (𝓋 [ s₁ / n₁ ]ᵥ [ s₂ / suc (n₁ + n₂) ]ᵥ) k
 //ᵥ 𝓋 s₁ s₂ n₁ n₂ k with <-cmp k n₁ | <-cmp k (suc (n₁ + n₂))
 ... | tri< _ _ ¬p   | tri≈ _ refl _ = ⊥-elim $ ¬p $ s≤s (m≤m+n _ _)

@@ -1,9 +1,9 @@
 ---
-title: Agda一阶逻辑(3) 解释
+title: Agda一阶逻辑(4) 自由项解释
 zhihu-tags: Agda, 数理逻辑
 ---
 
-# Agda一阶逻辑(3) 解释
+# Agda一阶逻辑(4) 自由项解释
 
 > 交流Q群: 893531731  
 > 本文源码: [Interpretation.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/Interpretation.lagda.md)  
@@ -33,7 +33,7 @@ open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Binary using (Decidable)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)
+open import Relation.Binary.PropositionalEquality using (_≡_)
 open import Relation.Nullary using (Dec; yes; no; ¬_)
 ```
 
@@ -51,50 +51,47 @@ record Interpretation : Set (suc u) where
     relmap : ∀ {n} → σ .relations n → Vec domain n → Bool
 
 open Interpretation
-
-Valuation : Interpretation → Set u
-Valuation 𝒾 = ℕ → 𝒾 .domain
 ```
 
 ## 实现
 
 ```agda
-module PreRealizer (𝒾 : Interpretation) where
+module PreRealizer (𝒮 : Interpretation) where
   open Termₗ
   open Formulaₗ
 
-  realizeₜ : ∀ {l} (𝓋 : Valuation 𝒾) (t : Termₗ l) (xs : Vec (𝒾 .domain) l) → 𝒾 .domain
+  realizeₜ : ∀ (𝓋 : ℕ → 𝒮 .domain) (t : Termₗ l) (xs : Vec (𝒮 .domain) l) → 𝒮 .domain
   realizeₜ 𝓋 (var k)     xs = 𝓋 k
-  realizeₜ 𝓋 (func f)    xs = 𝒾 .funmap f xs
+  realizeₜ 𝓋 (func f)    xs = 𝒮 .funmap f xs
   realizeₜ 𝓋 (app t₁ t₂) xs = realizeₜ 𝓋 t₁ ((realizeₜ 𝓋 t₂ []) ∷ xs)
 
-  realize : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Set u
+  realize : ∀ (𝓋 : ℕ → 𝒮 .domain) (φ : Formulaₗ l) (xs : Vec (𝒮 .domain) l) → Set u
   realize 𝓋 ⊥          xs = False
-  realize 𝓋 (rel R)    xs = Lift _ $ T $ 𝒾 .relmap R xs
+  realize 𝓋 (rel R)    xs = Lift _ $ T $ 𝒮 .relmap R xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
   realize 𝓋 (∀' φ)     xs = ∀ x → realize (𝓋 [ x / 0 ]ᵥ) φ xs
 
-  dec : ∀ {l} (𝓋 : Valuation 𝒾) (φ : Formulaₗ l) (xs : Vec (𝒾 .domain) l) → Dec (realize 𝓋 φ xs)
+  dec : ∀ (𝓋 : ℕ → 𝒮 .domain) (φ : Formulaₗ l) (xs : Vec (𝒮 .domain) l) → Dec (realize 𝓋 φ xs)
   dec 𝓋 ⊥ xs = no λ ()
-  dec 𝓋 (rel R) xs with 𝒾 .relmap R xs
+  dec 𝓋 (rel R) xs with 𝒮 .relmap R xs
   ... | true  = yes tt
   ... | false = no λ ()
   dec 𝓋 (appᵣ φ t) xs = dec 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
-  dec 𝓋 (t₁ ≈ t₂) [] = 𝒾 .deceq (realizeₜ 𝓋 t₁ []) (realizeₜ 𝓋 t₂ [])
+  dec 𝓋 (t₁ ≈ t₂) [] = 𝒮 .deceq (realizeₜ 𝓋 t₁ []) (realizeₜ 𝓋 t₂ [])
   dec 𝓋 (φ₁ ⇒ φ₂) xs with dec 𝓋 φ₁ xs | dec 𝓋 φ₂ xs
   ... | _     | yes q = yes λ _ → q
   ... | yes p | no ¬q = no  λ p→q → ¬q $ p→q p
   ... | no ¬p | no _  = yes λ p → ⊥-elim $ ¬p p
-  dec 𝓋 (∀' φ) [] = 𝒾 .compactness _ (λ x → dec (𝓋 [ x / 0 ]ᵥ) φ [])
+  dec 𝓋 (∀' φ) [] = 𝒮 .compactness _ (λ x → dec (𝓋 [ x / 0 ]ᵥ) φ [])
 ```
 
 ```agda
-module Realizer (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
-  open PreRealizer 𝒾 renaming (realizeₜ to rₜ; realize to r; dec to d)
+module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) where
+  open PreRealizer 𝒮 renaming (realizeₜ to rₜ; realize to r; dec to d)
 
-  realizeₜ : Term → 𝒾 .domain
+  realizeₜ : Term → 𝒮 .domain
   realizeₜ t = rₜ 𝓋 t []
 
   realize : Formula → Set u
@@ -113,5 +110,5 @@ module Realizer (𝒾 : Interpretation) (𝓋 : Valuation 𝒾) where
 open Realizer
 
 _⊨_ : Theory → Formula → Set (suc u)
-Γ ⊨ φ = ∀ 𝒾 𝓋 → valid 𝒾 𝓋 Γ → realize 𝒾 𝓋 φ
+Γ ⊨ φ = ∀ 𝒮 𝓋 → valid 𝒮 𝓋 Γ → realize 𝒮 𝓋 φ
 ```
