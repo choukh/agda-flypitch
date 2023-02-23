@@ -93,6 +93,7 @@ module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) where
 
 ```agda
 open Realizer
+infix 4 _⊨_
 
 _⊨_ : Theory → Formula → Set (suc u)
 Γ ⊨ φ = ∀ 𝒮 𝓋 → valid 𝒮 𝓋 Γ → realize 𝒮 𝓋 φ

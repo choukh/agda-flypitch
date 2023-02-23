@@ -33,6 +33,7 @@ open import Function using (_$_)
 open import Relation.Nullary using (Dec)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
+open import StdlibExt.Relation.Nullary.Inhabited using (inhabited)
 ```
 
 ## 实现
@@ -69,13 +70,7 @@ module OpenedRealizer (𝒮 : Interpretation) {n} (𝓋 : Vec (𝒮 .domain) n) 
 
 ```agda
 module ClosedRealizer (𝒮 : Interpretation) where
-  open OpenedRealizer 𝒮 [] renaming (realizeₜ to rₜ; realize to r)
-
-  realizeₜ : ClosedTerm → 𝒮 .domain
-  realizeₜ t = rₜ t
-
-  realize : Sentence → Set u
-  realize φ = r φ
+  open OpenedRealizer 𝒮 [] public
 
   valid : Theory → Set u
   valid Γ = ∀ φ → φ ∈ Γ → realize φ
@@ -85,7 +80,8 @@ module ClosedRealizer (𝒮 : Interpretation) where
 
 ```agda
 open ClosedRealizer
+infix 4 _⊨_
 
 _⊨_ : Theory → Sentence → Set (suc u)
-Γ ⊨ φ = ∀ 𝒮 → valid 𝒮 Γ → realize 𝒮 φ
+Γ ⊨ φ = ∀ 𝒮 → inhabited (𝒮 .domain) → valid 𝒮 Γ → realize 𝒮 φ
 ```

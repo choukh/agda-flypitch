@@ -1,6 +1,6 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-module StdlibExt.Relation.Unary.Pred where
+module StdlibExt.Relation.Unary where
 
 open import Level
 open import Data.Empty.Polymorphic using (⊥)
