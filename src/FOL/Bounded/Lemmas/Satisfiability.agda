@@ -15,9 +15,8 @@ open import Function.Equality using (_⟨$⟩_) public
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import StdlibExt.Relation.Unary using (_⟦_⟧)
 open import StdlibExt.Relation.Binary.PropositionalEquivalence
-open import StdlibExt.Relation.Nullary.Inhabited using (here)
 
 bound⊨ : ∀ {Γ φ} → unbound ⟦ Γ ⟧ Free.⊨ unbound φ → Γ ⊨ φ
-bound⊨ {Γ} {φ} ⊨ 𝒮 (here x) vld = let 𝓋 = λ _ → x in
+bound⊨ {Γ} {φ} ⊨ 𝒮 x vld = let 𝓋 = λ _ → x in
   from (realize-iff 𝒮 𝓋 φ) ⟨$⟩ ⊨ 𝒮 𝓋 λ { ψ' (ψ , ψ∈Γ , refl) →
   to   (realize-iff 𝒮 𝓋 ψ) ⟨$⟩ vld ψ ψ∈Γ }

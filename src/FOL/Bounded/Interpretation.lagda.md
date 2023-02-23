@@ -33,7 +33,6 @@ open import Function using (_$_)
 open import Relation.Nullary using (Dec)
 open import Relation.Unary using (Pred; _∈_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
-open import StdlibExt.Relation.Nullary.Inhabited using (inhabited)
 ```
 
 ## 实现
@@ -83,5 +82,5 @@ open ClosedRealizer
 infix 4 _⊨_
 
 _⊨_ : Theory → Sentence → Set (suc u)
-Γ ⊨ φ = ∀ 𝒮 → inhabited (𝒮 .domain) → valid 𝒮 Γ → realize 𝒮 φ
+Γ ⊨ φ = ∀ 𝒮 → 𝒮 .domain → valid 𝒮 Γ → realize 𝒮 φ
 ```
