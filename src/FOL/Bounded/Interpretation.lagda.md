@@ -27,6 +27,7 @@ open Interpretation
 open import Level
 open import Data.Empty using (⊥-elim)
 open import Data.Empty.Polymorphic renaming (⊥ to False) hiding (⊥-elim)
+open import Data.Product using (Σ-syntax)
 open import Data.Vec using (Vec; []; _∷_; lookup)
 open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
@@ -70,17 +71,20 @@ module OpenedRealizer (𝒮 : Interpretation) {n} (𝓋 : Vec (𝒮 .domain) n) 
 ```agda
 module ClosedRealizer (𝒮 : Interpretation) where
   open OpenedRealizer 𝒮 [] public
-
-  valid : Theory → Set u
-  valid Γ = ∀ φ → φ ∈ Γ → realize φ
 ```
 
 ## 可满足性
 
 ```agda
 open ClosedRealizer
-infix 4 _⊨_
+infix 4 _⊨ˢ_ _⊨ᵀ_ _⊨_
+
+_⊨ˢ_ : Interpretation → Sentence → Set u
+𝒮 ⊨ˢ φ = realize 𝒮 φ
+
+_⊨ᵀ_ : Interpretation → Theory → Set u
+𝒮 ⊨ᵀ Γ = ∀ φ → φ ∈ Γ → 𝒮 ⊨ˢ φ
 
 _⊨_ : Theory → Sentence → Set (suc u)
-Γ ⊨ φ = ∀ 𝒮 → 𝒮 .domain → valid 𝒮 Γ → realize 𝒮 φ
+Γ ⊨ φ = ∀ 𝒮 → 𝒮 .domain → 𝒮 ⊨ᵀ Γ → 𝒮 ⊨ˢ φ
 ```

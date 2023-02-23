@@ -84,17 +84,17 @@ module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) where
 
   realize : Formula → Set u
   realize φ = r 𝓋 φ []
-
-  valid : Theory → Set u
-  valid Γ = ∀ φ → φ ∈ Γ → realize φ
 ```
 
 ## 可满足性
 
 ```agda
 open Realizer
-infix 4 _⊨_
+infix 4 _⊨[_]_ _⊨_
+
+_⊨[_]_ : ∀ (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) → Theory → Set u
+𝒮 ⊨[ 𝓋 ] Γ = ∀ φ → φ ∈ Γ → realize 𝒮 𝓋 φ
 
 _⊨_ : Theory → Formula → Set (suc u)
-Γ ⊨ φ = ∀ 𝒮 𝓋 → valid 𝒮 𝓋 Γ → realize 𝒮 𝓋 φ
+Γ ⊨ φ = ∀ 𝒮 𝓋 → 𝒮 ⊨[ 𝓋 ] Γ → realize 𝒮 𝓋 φ
 ```
