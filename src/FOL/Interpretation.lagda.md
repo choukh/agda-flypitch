@@ -39,7 +39,9 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 
 ## 解释 (结构)
 
-函数符号和关系符号的一套实际所指就构成了一阶逻辑的一种解释 (从解释所得到的实际产物的角度来看又叫做结构). 它由一个集合 `domain` 以及两个映射 `funmap` 和 `relmap` 组成. 其中 `funmap` 用于映射函数符号到函数, `relmap` 用于映射关系符号到关系. 注意函数和关系的n元参数编码为n维向量. 由于一阶逻辑是经典逻辑, 其解释也必须是经典的, 因此还需要经典逻辑的排中律 `classical`.
+函数符号和关系符号的一套实际所指就构成了一阶逻辑的一种解释 (从解释所得到的实际产物的角度来看又叫做结构). 它由一个集合 `domain` 以及两个映射 `funmap` 和 `relmap` 组成. 其中 `funmap` 用于映射函数符号到函数, `relmap` 用于映射关系符号到关系. 注意函数和关系的n元参数编码为n维向量.
+
+此外, 由于一阶逻辑是经典逻辑, 其解释也必须是经典的, 因此还需要经典逻辑的排中律 `classical`. 我们把它标记为实例参数 (instance arguments) 使得它用起来就像一个局部的公理.
 
 ```agda
 record Interpretation : Set (suc u) where
@@ -47,7 +49,7 @@ record Interpretation : Set (suc u) where
     domain : Set u
     funmap : ∀ {n} → σ .functions n → Vec domain n → domain
     relmap : ∀ {n} → σ .relations n → Vec domain n → Set u
-    classical : ExcludedMiddle u
+    ⦃ classical ⦄ : ExcludedMiddle u
 
 open Interpretation
 ```

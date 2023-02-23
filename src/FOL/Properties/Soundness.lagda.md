@@ -34,7 +34,7 @@ open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_; 
 ```agda
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
 soundness (axiom φ∈Γ) _ _ vld = vld _ φ∈Γ
-soundness {_} {φ} (⊥-elim ⊢₀) 𝒮 𝓋 vld = byContra (𝒮 .classical) λ ¬ → soundness ⊢₀ 𝒮 𝓋
+soundness {_} {φ} (⊥-elim ⊢₀) 𝒮 𝓋 vld = byContra λ ¬ → soundness ⊢₀ 𝒮 𝓋
   λ { φ₁ (inj₁ φ∈Γ)  → vld φ₁ φ∈Γ
     ; φ₁ (inj₂ refl) → lift ∘ ¬ }
 soundness (≈-refl _ t) _ _ _ = refl
