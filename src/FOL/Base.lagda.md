@@ -21,7 +21,7 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 open import FOL.Signature using (Signature)
 open Signature
 
-module FOL.Base {u} (σ : Signature {u}) where
+module FOL.Base {u} (ℒ : Signature {u}) where
 ```
 
 ### 标准库依赖
@@ -74,7 +74,7 @@ variable
 
 data Termₗ : ℕ → Set u where
   var  : ∀ (k : ℕ) → Termₗ 0
-  func : ∀ (f : σ .functions l) → Termₗ l
+  func : ∀ (f : ℒ .functions l) → Termₗ l
   app  : ∀ (t₁ : Termₗ (suc l)) (t₂ : Termₗ 0) → Termₗ l
 
 Term = Termₗ 0
@@ -134,7 +134,7 @@ n元关系在公式中的处理与n元函数在项中的处理类似, 我们把�
 ```agda
 data Formulaₗ : ℕ → Set u where
   ⊥     : Formulaₗ 0
-  rel   : ∀ (R : σ .relations l) → Formulaₗ l
+  rel   : ∀ (R : ℒ .relations l) → Formulaₗ l
   appᵣ  : ∀ (φ : Formulaₗ (suc l)) (t : Term) → Formulaₗ l
   _≈_   : ∀ (t₁ t₂ : Term) → Formulaₗ 0
   _⇒_   : ∀ (φ₁ φ₂ : Formulaₗ 0) → Formulaₗ 0

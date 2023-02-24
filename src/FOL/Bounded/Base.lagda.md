@@ -18,8 +18,8 @@ zhihu-tags: Agda, 数理逻辑
 open import FOL.Signature using (Signature)
 open Signature
 
-module FOL.Bounded.Base {u} (σ : Signature {u}) where
-import FOL.Base σ as Free
+module FOL.Bounded.Base {u} (ℒ : Signature {u}) where
+import FOL.Base ℒ as Free
 open Free using (l) public
 open Free.Termₗ
 open Free.Formulaₗ
@@ -57,7 +57,7 @@ infix 4 _⊢_
 ```agda
 data Termₗ (n : ℕ) : ℕ → Set u where
   var  : ∀ (k : Fin n) → Termₗ n 0
-  func : ∀ (f : σ .functions l) → Termₗ n l
+  func : ∀ (f : ℒ .functions l) → Termₗ n l
   app  : ∀ (t₁ : Termₗ n (suc l)) (t₂ : Termₗ n 0) → Termₗ n l
 
 Term = λ n → Termₗ n 0
@@ -76,7 +76,7 @@ ClosedTerm = ClosedTermₗ 0
 ```agda
 data Formulaₗ (n : ℕ) : ℕ → Set u where
   ⊥     : Formulaₗ n 0
-  rel   : ∀ (R : σ .relations l) → Formulaₗ n l
+  rel   : ∀ (R : ℒ .relations l) → Formulaₗ n l
   appᵣ  : ∀ (φ : Formulaₗ n (suc l)) (t : Term n) → Formulaₗ n l
   _≈_   : ∀ (t₁ t₂ : Term n) → Formulaₗ n 0
   _⇒_   : ∀ (φ₁ φ₂ : Formulaₗ n 0) → Formulaₗ n 0

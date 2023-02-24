@@ -15,8 +15,8 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Interpretation {u} (σ : Signature {u}) where
-open import FOL.Base σ hiding (⊥-elim)
+module FOL.Interpretation {u} (ℒ : Signature {u}) where
+open import FOL.Base ℒ hiding (⊥-elim)
 open Signature
 ```
 
@@ -47,8 +47,8 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 record Interpretation : Set (suc u) where
   field
     domain : Set u
-    funmap : ∀ {n} → σ .functions n → Vec domain n → domain
-    relmap : ∀ {n} → σ .relations n → Vec domain n → Set u
+    funmap : ∀ {n} → ℒ .functions n → Vec domain n → domain
+    relmap : ∀ {n} → ℒ .relations n → Vec domain n → Set u
     ⦃ classical ⦄ : ExcludedMiddle u
 
 open Interpretation

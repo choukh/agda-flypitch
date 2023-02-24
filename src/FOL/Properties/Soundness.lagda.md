@@ -14,7 +14,7 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --lossy-unification #-}
 
 open import FOL.Signature
-module FOL.Properties.Soundness {u} (σ : Signature {u}) where
+module FOL.Properties.Soundness {u} (ℒ : Signature {u}) where
 
 open import Level using (lift)
 open import Data.Nat using (ℕ)
@@ -29,9 +29,9 @@ open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_; 
 
 ```agda
 module Free where
-  open import FOL.Base σ
-  open import FOL.Interpretation σ
-  open import FOL.Lemmas.Realization σ
+  open import FOL.Base ℒ
+  open import FOL.Interpretation ℒ
+  open import FOL.Lemmas.Realization ℒ
   open Interpretation
   open Realizer
 
@@ -54,9 +54,9 @@ module Free where
 ```
 
 ```agda
-open import FOL.Bounded.Base σ using (_⊢_)
-open import FOL.Bounded.Interpretation σ using (_⊨_)
-open import FOL.Bounded.Lemmas.Satisfiability σ using (bound⊨)
+open import FOL.Bounded.Base ℒ using (_⊢_)
+open import FOL.Bounded.Interpretation ℒ using (_⊨_)
+open import FOL.Bounded.Lemmas.Satisfiability ℒ using (bound⊨)
 
 soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ
 soundness = bound⊨ ∘ Free.soundness

@@ -1,8 +1,8 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Lemmas.Lifting {u} (σ : Signature {u}) where
-open import FOL.Base σ hiding (⊥-elim)
+module FOL.Lemmas.Lifting {u} (ℒ : Signature {u}) where
+open import FOL.Base ℒ hiding (⊥-elim)
 
 open import Data.Nat
 open import Data.Nat.Properties

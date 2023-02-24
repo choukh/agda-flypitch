@@ -59,8 +59,8 @@ module ExampleSignaturePA where
   data rel : ℕ → Set where
     < : rel 2
 
-  σ : Signature
-  σ = record
+  ℒ : Signature
+  ℒ = record
     { functions = func
     ; relations = rel
     }

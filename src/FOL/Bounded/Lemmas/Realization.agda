@@ -2,12 +2,12 @@
 
 open import FOL.Signature
 open import FOL.Interpretation using (Interpretation)
-module FOL.Bounded.Lemmas.Realization {u} (σ : Signature {u}) (𝒮 : Interpretation σ) where
+module FOL.Bounded.Lemmas.Realization {u} (ℒ : Signature {u}) (𝒮 : Interpretation ℒ) where
 
-open import FOL.Base σ using (_[_/_]ᵥ)
-open import FOL.Bounded.Base σ
-open import FOL.Bounded.Interpretation σ
-import FOL.Interpretation σ as Free
+open import FOL.Base ℒ using (_[_/_]ᵥ)
+open import FOL.Bounded.Base ℒ
+open import FOL.Bounded.Interpretation ℒ
+import FOL.Interpretation ℒ as Free
 open FOL.Interpretation.Interpretation
 
 open import Data.Nat

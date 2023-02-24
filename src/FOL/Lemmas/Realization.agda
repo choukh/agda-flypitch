@@ -2,12 +2,12 @@
 
 open import FOL.Signature
 open import FOL.Interpretation using (Interpretation)
-module FOL.Lemmas.Realization {u} (σ : Signature {u}) (𝒮 : Interpretation σ) where
+module FOL.Lemmas.Realization {u} (ℒ : Signature {u}) (𝒮 : Interpretation ℒ) where
 
-open import FOL.Base σ hiding (⊥-elim; subst)
-open import FOL.Lemmas.Lifting σ
-open import FOL.Lemmas.Substitution σ
-open import FOL.Interpretation σ
+open import FOL.Base ℒ hiding (⊥-elim; subst)
+open import FOL.Lemmas.Lifting ℒ
+open import FOL.Lemmas.Substitution ℒ
+open import FOL.Interpretation ℒ
 open FOL.Interpretation.Interpretation
 
 open import Data.Nat

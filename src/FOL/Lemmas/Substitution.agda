@@ -1,8 +1,8 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Lemmas.Substitution {u} (σ : Signature {u}) where
-open import FOL.Base σ hiding (⊥-elim; subst)
+module FOL.Lemmas.Substitution {u} (ℒ : Signature {u}) where
+open import FOL.Base ℒ hiding (⊥-elim; subst)
 
 open import Level using (Level)
 open import Data.Nat

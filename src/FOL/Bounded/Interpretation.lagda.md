@@ -15,9 +15,9 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Bounded.Interpretation {u} (σ : Signature {u}) where
-open import FOL.Bounded.Base σ
-open import FOL.Interpretation σ using (Interpretation) public
+module FOL.Bounded.Interpretation {u} (ℒ : Signature {u}) where
+open import FOL.Bounded.Base ℒ
+open import FOL.Interpretation ℒ using (Interpretation) public
 open Interpretation
 ```
 
@@ -27,7 +27,7 @@ open Interpretation
 open import Level
 open import Data.Empty using (⊥-elim)
 open import Data.Empty.Polymorphic renaming (⊥ to False) hiding (⊥-elim)
-open import Data.Product using (Σ-syntax)
+open import Data.Product using (ℒ-syntax)
 open import Data.Vec using (Vec; []; _∷_; lookup)
 open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
