@@ -27,7 +27,7 @@ open Interpretation
 open import Level
 open import Data.Empty using (⊥-elim)
 open import Data.Empty.Polymorphic renaming (⊥ to False) hiding (⊥-elim)
-open import Data.Product using (ℒ-syntax)
+open import Data.Product using (Σ-syntax)
 open import Data.Vec using (Vec; []; _∷_; lookup)
 open import Data.Unit.Polymorphic using (tt)
 open import Function using (_$_)
