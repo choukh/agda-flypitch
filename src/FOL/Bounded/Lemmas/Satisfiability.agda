@@ -1,14 +1,13 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Bounded.Lemmas.Satisfiability {u} (ℒ : Signature {u}) where
+module FOL.Bounded.Lemmas.Satisfiability (ℒ : Signature {u}) where
 
 import FOL.Interpretation ℒ as Free
 open import FOL.Bounded.Base ℒ
 open import FOL.Bounded.Interpretation ℒ
 open import FOL.Bounded.Lemmas.Realization ℒ
 open Closed using (realize-iff)
-open Interpretation
 
 open import Data.Product using (_,_)
 open import Function.Equality using (_⟨$⟩_) public

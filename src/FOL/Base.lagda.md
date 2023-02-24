@@ -18,10 +18,9 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Signature using (Signature)
-open Signature
-
-module FOL.Base {u} (ℒ : Signature {u}) where
+open import FOL.Signature
+module FOL.Base (ℒ : Signature {u}) where
+open Signature ℒ
 ```
 
 ### 标准库依赖
@@ -74,7 +73,7 @@ variable
 
 data Termₗ : ℕ → Set u where
   var  : ∀ (k : ℕ) → Termₗ 0
-  func : ∀ (f : ℒ .functions l) → Termₗ l
+  func : ∀ (f : functions l) → Termₗ l
   app  : ∀ (t₁ : Termₗ (suc l)) (t₂ : Termₗ 0) → Termₗ l
 
 Term = Termₗ 0
@@ -134,7 +133,7 @@ n元关系在公式中的处理与n元函数在项中的处理类似, 我们把�
 ```agda
 data Formulaₗ : ℕ → Set u where
   ⊥     : Formulaₗ 0
-  rel   : ∀ (R : ℒ .relations l) → Formulaₗ l
+  rel   : ∀ (R : relations l) → Formulaₗ l
   appᵣ  : ∀ (φ : Formulaₗ (suc l)) (t : Term) → Formulaₗ l
   _≈_   : ∀ (t₁ t₂ : Term) → Formulaₗ 0
   _⇒_   : ∀ (φ₁ φ₂ : Formulaₗ 0) → Formulaₗ 0
@@ -222,7 +221,7 @@ _↥_ : ∀ (φ : Formulaₗ l) (n : ℕ) → Formulaₗ l
 `t₀ t₁ t₂ t₃ s t₄ t₅ t₆ t₇ ...`
 
 ```agda
-insert_into_at_ : ∀ {u} {T : Set u} (s : T) (𝓋 : ℕ → T) (n : ℕ) → (ℕ → T)
+insert_into_at_ : ∀ {A : Set u} (s : A) (𝓋 : ℕ → A) (n : ℕ) → (ℕ → A)
 (insert s into 𝓋 at n) k with <-cmp k n
 ... | tri< _ _ _ = 𝓋 k
 ... | tri≈ _ _ _ = s
@@ -234,7 +233,7 @@ insert_into_at_ : ∀ {u} {T : Set u} (s : T) (𝓋 : ℕ → T) (n : ℕ) → (
 其中, `insert (s ↑ n) into var at n` 的意思是往 `var` 中插入 `s ↑ n` 于 `n` 处. 将 `s` 提升 `n` 是为了保证 `s` 中的变量不会与 `t` 中的变量冲突.
 
 ```agda
-_[_/_]ᵥ : ∀ {u} {T : Set u} (𝓋 : ℕ → T) (s : T) (n : ℕ) → (ℕ → T)
+_[_/_]ᵥ : ∀ {A : Set u} (𝓋 : ℕ → A) (s : A) (n : ℕ) → (ℕ → A)
 𝓋 [ s / n ]ᵥ = insert s into 𝓋 at n
 
 _[_/_]ₜ : ∀ (t : Termₗ l) (s : Term) (n : ℕ) → Termₗ l

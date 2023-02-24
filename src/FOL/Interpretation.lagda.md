@@ -15,9 +15,9 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Interpretation {u} (ℒ : Signature {u}) where
+module FOL.Interpretation (ℒ : Signature {u}) where
 open import FOL.Base ℒ hiding (⊥-elim)
-open Signature
+open Signature ℒ
 ```
 
 ### 标准库依赖
@@ -39,36 +39,35 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 
 ## 解释 (结构)
 
-函数符号和关系符号的一套实际所指就构成了一阶逻辑的一种解释 (从解释所得到的实际产物的角度来看又叫做结构). 它由一个集合 `domain` 以及两个映射 `funmap` 和 `relmap` 组成. 其中 `funmap` 用于映射函数符号到函数, `relmap` 用于映射关系符号到关系. 注意函数和关系的n元参数编码为n维向量.
+函数符号和关系符号的一套实际所指就构成了一阶逻辑的一种解释 (从解释所得到的实际产物的角度来看又叫做结构). 它由一个集合 `Domain` 以及两个映射 `funmap` 和 `relmap` 组成. 其中 `funmap` 用于映射函数符号到函数, `relmap` 用于映射关系符号到关系. 注意函数和关系的n元参数编码为n维向量.
 
 此外, 由于一阶逻辑是经典逻辑, 其解释也必须是经典的, 因此还需要经典逻辑的排中律 `classical`. 我们把它标记为实例参数 (instance arguments) 使得它用起来就像一个局部的公理.
 
 ```agda
 record Interpretation : Set (suc u) where
   field
-    domain : Set u
-    funmap : ∀ {n} → ℒ .functions n → Vec domain n → domain
-    relmap : ∀ {n} → ℒ .relations n → Vec domain n → Set u
+    Domain : Set u
+    funmap : ∀ {n} → functions n → Vec Domain n → Domain
+    relmap : ∀ {n} → relations n → Vec Domain n → Set u
     ⦃ classical ⦄ : ExcludedMiddle u
-
-open Interpretation
 ```
 
 ## 实现
 
 ```agda
 module PreRealizer (𝒮 : Interpretation) where
+  open Interpretation 𝒮
   open Termₗ
   open Formulaₗ
 
-  realizeₜ : ∀ (𝓋 : ℕ → 𝒮 .domain) (t : Termₗ l) (xs : Vec (𝒮 .domain) l) → 𝒮 .domain
+  realizeₜ : ∀ (𝓋 : ℕ → Domain) (t : Termₗ l) (xs : Vec Domain l) → Domain
   realizeₜ 𝓋 (var k)     xs = 𝓋 k
-  realizeₜ 𝓋 (func f)    xs = 𝒮 .funmap f xs
+  realizeₜ 𝓋 (func f)    xs = funmap f xs
   realizeₜ 𝓋 (app t₁ t₂) xs = realizeₜ 𝓋 t₁ ((realizeₜ 𝓋 t₂ []) ∷ xs)
 
-  realize : ∀ (𝓋 : ℕ → 𝒮 .domain) (φ : Formulaₗ l) (xs : Vec (𝒮 .domain) l) → Set u
+  realize : ∀ (𝓋 : ℕ → Domain) (φ : Formulaₗ l) (xs : Vec Domain l) → Set u
   realize 𝓋 ⊥          xs = False
-  realize 𝓋 (rel R)    xs = 𝒮 .relmap R xs
+  realize 𝓋 (rel R)    xs = relmap R xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
@@ -76,10 +75,11 @@ module PreRealizer (𝒮 : Interpretation) where
 ```
 
 ```agda
-module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) where
+open Interpretation
+module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → Domain 𝒮) where
   open PreRealizer 𝒮 renaming (realizeₜ to rₜ; realize to r)
 
-  realizeₜ : Term → 𝒮 .domain
+  realizeₜ : Term → Domain 𝒮
   realizeₜ t = rₜ 𝓋 t []
 
   realize : Formula → Set u
@@ -92,7 +92,7 @@ module Realizer (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) where
 open Realizer
 infix 4 _⊨[_]_ _⊨_
 
-_⊨[_]_ : ∀ (𝒮 : Interpretation) (𝓋 : ℕ → 𝒮 .domain) → Theory → Set u
+_⊨[_]_ : ∀ (𝒮 : Interpretation) (𝓋 : ℕ → Domain 𝒮) → Theory → Set u
 𝒮 ⊨[ 𝓋 ] Γ = ∀ φ → φ ∈ Γ → realize 𝒮 𝓋 φ
 
 _⊨_ : Theory → Formula → Set (suc u)

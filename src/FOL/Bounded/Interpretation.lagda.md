@@ -15,10 +15,9 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Bounded.Interpretation {u} (ℒ : Signature {u}) where
+module FOL.Bounded.Interpretation (ℒ : Signature {u}) where
 open import FOL.Bounded.Base ℒ
 open import FOL.Interpretation ℒ using (Interpretation) public
-open Interpretation
 ```
 
 ### 标准库依赖
@@ -40,17 +39,18 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 
 ```agda
 module PreRealizer (𝒮 : Interpretation) where
+  open Interpretation 𝒮
   open Termₗ
   open Formulaₗ
 
-  realizeₜ : ∀ (𝓋 : Vec (𝒮 .domain) n) (t : Termₗ n l) (xs : Vec (𝒮 .domain) l) → 𝒮 .domain
+  realizeₜ : ∀ (𝓋 : Vec Domain n) (t : Termₗ n l) (xs : Vec Domain l) → Domain
   realizeₜ 𝓋 (var k)      xs = lookup 𝓋 k
-  realizeₜ 𝓋 (func f)     xs = 𝒮 .funmap f xs
+  realizeₜ 𝓋 (func f)     xs = funmap f xs
   realizeₜ 𝓋 (app t₁ t₂)  xs = realizeₜ 𝓋 t₁ ((realizeₜ 𝓋 t₂ []) ∷ xs)
 
-  realize : ∀ (𝓋 : Vec (𝒮 .domain) n) (φ : Formulaₗ n l) (xs : Vec (𝒮 .domain) l) → Set u
+  realize : ∀ (𝓋 : Vec Domain n) (φ : Formulaₗ n l) (xs : Vec Domain l) → Set u
   realize 𝓋 ⊥          xs = False
-  realize 𝓋 (rel R)    xs = 𝒮 .relmap R xs
+  realize 𝓋 (rel R)    xs = relmap R xs
   realize 𝓋 (appᵣ φ t) xs = realize 𝓋 φ (realizeₜ 𝓋 t [] ∷ xs)
   realize 𝓋 (t₁ ≈ t₂)  xs = realizeₜ 𝓋 t₁ xs ≡ realizeₜ 𝓋 t₂ xs
   realize 𝓋 (φ₁ ⇒ φ₂)  xs = realize 𝓋 φ₁ xs → realize 𝓋 φ₂ xs
@@ -58,10 +58,11 @@ module PreRealizer (𝒮 : Interpretation) where
 ```
 
 ```agda
-module OpenedRealizer (𝒮 : Interpretation) {n} (𝓋 : Vec (𝒮 .domain) n) where
+open Interpretation
+module OpenedRealizer (𝒮 : Interpretation) {n} (𝓋 : Vec (Domain 𝒮) n) where
   open PreRealizer 𝒮 renaming (realizeₜ to rₜ; realize to r)
 
-  realizeₜ : Term n → 𝒮 .domain
+  realizeₜ : Term n → Domain 𝒮
   realizeₜ t = rₜ 𝓋 t []
 
   realize : Formula n → Set u
@@ -86,5 +87,5 @@ _⊨ᵀ_ : Interpretation → Theory → Set u
 𝒮 ⊨ᵀ Γ = ∀ φ → φ ∈ Γ → 𝒮 ⊨ˢ φ
 
 _⊨_ : Theory → Sentence → Set (suc u)
-Γ ⊨ φ = ∀ 𝒮 → 𝒮 .domain → 𝒮 ⊨ᵀ Γ → 𝒮 ⊨ˢ φ
+Γ ⊨ φ = ∀ 𝒮 → Domain 𝒮 → 𝒮 ⊨ᵀ Γ → 𝒮 ⊨ˢ φ
 ```

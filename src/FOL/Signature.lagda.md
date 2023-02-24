@@ -31,14 +31,17 @@ $$R^n_0,\ R^n_1,\ R^n_2,\ R^n_3,\ ...$$
 
 module FOL.Signature where
 
-open import Level using (suc)
+open import Level using (Level; suc)
 open import Data.Nat using (ℕ)
 ```
 
-**定义 (签名)** 由按元数分类的函数符号集族 `functions : ℕ → Set u` 以及按元数分类的关系符号集族 `relations : ℕ → Set u` 组成的资料叫做签名. 其中 `u` 是宇宙多态参数. 签名比符号集高一个宇宙. 常量集是元数为 0 的函数集.
+**定义 (签名)** 由按元数分类的函数符号集族 `functions : ℕ → Set u` 以及按元数分类的关系符号集族 `relations : ℕ → Set u` 组成的资料叫做签名. 常量集是元数为 0 的函数集. 其中 `u` 是宇宙多态参数. 签名比符号集高一个宇宙.
 
 ```agda
-record Signature {u} : Set (suc u) where
+variable
+  u : Level
+
+record Signature : Set (suc u) where
   field
     functions : ℕ → Set u
     relations : ℕ → Set u

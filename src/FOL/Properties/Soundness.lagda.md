@@ -14,7 +14,7 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --lossy-unification #-}
 
 open import FOL.Signature
-module FOL.Properties.Soundness {u} (ℒ : Signature {u}) where
+module FOL.Properties.Soundness (ℒ : Signature {u}) where
 
 open import Level using (lift)
 open import Data.Nat using (ℕ)
@@ -32,7 +32,6 @@ module Free where
   open import FOL.Base ℒ
   open import FOL.Interpretation ℒ
   open import FOL.Lemmas.Realization ℒ
-  open Interpretation
   open Realizer
 
   soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ

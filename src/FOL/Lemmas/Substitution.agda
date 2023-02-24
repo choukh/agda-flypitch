@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
 open import FOL.Signature
-module FOL.Lemmas.Substitution {u} (ℒ : Signature {u}) where
+module FOL.Lemmas.Substitution (ℒ : Signature {u}) where
 open import FOL.Base ℒ hiding (⊥-elim; subst)
 
 open import Level using (Level)
@@ -16,16 +16,16 @@ open import StdlibExt.Data.Nat.Properties
 
 private variable
   ℓ : Level
-  T : Set ℓ
+  A : Set ℓ
 
-/ᵥ-cong : ∀ {𝓋 𝓊 : ℕ → T} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : T) (n k : ℕ)
+/ᵥ-cong : ∀ {𝓋 𝓊 : ℕ → A} (ext : ∀ n → 𝓋 n ≡ 𝓊 n) (s : A) (n k : ℕ)
   → (𝓋 [ s / n ]ᵥ) k ≡ (𝓊 [ s / n ]ᵥ) k
 /ᵥ-cong ext s n k with <-cmp k n
 ... | tri< _ _ _ = ext k
 ... | tri≈ _ _ _ = refl
 ... | tri> _ _ _ = ext (k ∸ 1)
 
-//ᵥ : ∀ (𝓋 : ℕ → T) (s₁ s₂ : T) (n₁ n₂ k : ℕ)
+//ᵥ : ∀ (𝓋 : ℕ → A) (s₁ s₂ : A) (n₁ n₂ k : ℕ)
   → (𝓋 [ s₂ / n₁ + n₂ ]ᵥ [ s₁ / n₁ ]ᵥ) k ≡ (𝓋 [ s₁ / n₁ ]ᵥ [ s₂ / suc (n₁ + n₂) ]ᵥ) k
 //ᵥ 𝓋 s₁ s₂ n₁ n₂ k with <-cmp k n₁ | <-cmp k (suc (n₁ + n₂))
 ... | tri< _ _ ¬p   | tri≈ _ refl _ = ⊥-elim $ ¬p $ s≤s (m≤m+n _ _)
