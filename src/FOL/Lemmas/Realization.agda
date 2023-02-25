@@ -2,7 +2,7 @@
 
 open import FOL.Signature
 open import FOL.Interpretation using (Interpretation)
-module FOL.Lemmas.Realization (ℒ : Signature {u}) (𝒮 : Interpretation ℒ) where
+module FOL.Lemmas.Realization (𝒮 : Interpretation {u} ℒ) where
 
 open import FOL.Base ℒ hiding (⊥-elim; subst)
 open import FOL.Lemmas.Lifting ℒ

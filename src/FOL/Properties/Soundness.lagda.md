@@ -31,7 +31,7 @@ open import StdlibExt.Relation.Binary.PropositionalEquivalence u hiding (_∘_; 
 module Free where
   open import FOL.Base ℒ
   open import FOL.Interpretation ℒ
-  open import FOL.Lemmas.Realization ℒ
+  open import FOL.Lemmas.Realization
   open Realizer
 
   soundness : ∀ {Γ φ} → Γ ⊢ φ → Γ ⊨ φ

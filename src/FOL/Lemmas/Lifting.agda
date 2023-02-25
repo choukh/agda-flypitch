@@ -23,7 +23,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; con
 ... | yes _ = refl
 ... | no ¬q = ⊥-elim $ ¬q $ ≤-trans p ≤₁
 ↑[]↑[] (var k) n₁ m₁ n₂ m₂ ≤₁ ≤₂ | no ¬p with k + n₁ <? m₂
-... | yes q = ⊥-elim $ ¬p $ +-cancelʳ-≤ (suc k) m₁ (≤-trans q ≤₂)
+... | yes q = ⊥-elim $ ¬p $ +-cancelʳ-≤ n₁ (suc k) m₁ (≤-trans q ≤₂)
 ... | no  _ = cong var (+-assoc k _ _)
 ↑[]↑[] (func f) n₁ m₁ n₂ m₂ ≤₁ ≤₂ = refl
 ↑[]↑[] (app t₁ t₂) n₁ m₁ n₂ m₂ ≤₁ ≤₂

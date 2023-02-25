@@ -2,7 +2,7 @@
 
 open import FOL.Signature
 open import FOL.Interpretation using (Interpretation)
-module FOL.Bounded.Lemmas.Realization (ℒ : Signature {u}) (𝒮 : Interpretation ℒ) where
+module FOL.Bounded.Lemmas.Realization (𝒮 : Interpretation {u} ℒ) where
 
 open import FOL.Base ℒ using (_[_/_]ᵥ)
 open import FOL.Bounded.Base ℒ

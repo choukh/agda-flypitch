@@ -6,7 +6,7 @@ module FOL.Bounded.Lemmas.Satisfiability (ℒ : Signature {u}) where
 import FOL.Interpretation ℒ as Free
 open import FOL.Bounded.Base ℒ
 open import FOL.Bounded.Interpretation ℒ
-open import FOL.Bounded.Lemmas.Realization ℒ
+open import FOL.Bounded.Lemmas.Realization
 open Closed using (realize-iff)
 
 open import Data.Product using (_,_)

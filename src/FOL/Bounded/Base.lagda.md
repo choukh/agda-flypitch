@@ -70,6 +70,16 @@ ClosedTermₗ = λ l → Termₗ 0 l
 ClosedTerm = ClosedTermₗ 0
 ```
 
+```agda
+variable
+  n : ℕ
+```
+
+```agda
+const : Constants → Term n
+const = func
+```
+
 ## 束缚公式
 
 ```agda
@@ -99,11 +109,6 @@ Theory = Pred (Sentence) u
 ```
 
 ### 导出符号
-
-```agda
-variable
-  n : ℕ
-```
 
 ```agda
 ~_ : Formula n → Formula n
