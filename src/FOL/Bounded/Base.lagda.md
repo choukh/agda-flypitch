@@ -76,7 +76,7 @@ variable
 ```
 
 ```agda
-const : Constants → Term n
+const : Constant → Term n
 const = func
 ```
 

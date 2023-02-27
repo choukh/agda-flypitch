@@ -45,7 +45,7 @@ record Language : Set (suc u) where
   field
     functions : ℕ → Set u
     relations : ℕ → Set u
-  Constants = functions 0
+  Constant = functions 0
 ```
 
 **例** 下面给出了语言的一个实例 `ℒ`, 它可以作为皮亚诺算术 (一种一阶理论) 的语言. 注意符号的元数被编码到了类型里面. 例如, 常量 `O` 的类型是 `func 0`, 后继函数 `S` 的类型是 `func 1`, 加法 `+` 以及乘法 `*` 的类型是 `func 2`, 小于关系 `<` 的类型是 `rel 2`.

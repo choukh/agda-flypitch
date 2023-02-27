@@ -24,7 +24,7 @@ open LHom using (_⟶_)
 ```
 
 ```agda
-open import Data.Nat using (ℕ)
+open import Data.Nat using (ℕ; zero; suc)
 open import Function using (_$_; id)
 open import StdlibExt.Relation.Unary using (_∪_; _⟦_⟧; replacement-syntax)
 ```
@@ -46,12 +46,12 @@ languageMorph = record { funcMorph = Functions.include ; relMorph = id }
 ```
 
 ```agda
-witnessOf : Formula ℒ 1 → Constants $ Stepᴸ ℒ
+witnessOf : Formula ℒ 1 → Constant $ Stepᴸ ℒ
 witnessOf = Functions.witness
 ```
 
 ```agda
-[_witnessing_] : Constants ℒ → Formula ℒ 1 → Sentence ℒ
+[_witnessing_] : Constant ℒ → Formula ℒ 1 → Sentence ℒ
 [_witnessing_] {ℒ} c φ = (∃' φ) ⇒ φ [ const c / 0 ] where
   open FOL.Bounded.Base ℒ
   open FOL.Bounded.Substitution ℒ
@@ -61,4 +61,14 @@ witnessOf = Functions.witness
 Step : Theory ℒ → Theory $ Stepᴸ ℒ
 Step {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ ] ∣ φ ∈ Formula ℒ 1 ｝
   where open LHom.Bounded languageMorph
+```
+
+```agda
+languageChain : ∀ {ℒ} → ℕ → Language
+languageChain {ℒ} zero    = ℒ
+languageChain {ℒ} (suc n) = Stepᴸ (languageChain {ℒ} n)
+```
+
+```agda
+--Diagram
 ```
