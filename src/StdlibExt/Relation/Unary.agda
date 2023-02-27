@@ -3,11 +3,10 @@
 module StdlibExt.Relation.Unary where
 
 open import Level
-open import Data.Empty.Polymorphic using (⊥)
 open import Data.Product using (_×_; _,_; ∃-syntax)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Relation.Unary using (Pred; _∈_; _⊆_; ｛_｝; _∪_) public
+open import Relation.Unary using (Pred; U; _∈_; _⊆_; ｛_｝; _∪_) public
 
 private variable
   a b ℓ : Level
@@ -18,9 +17,6 @@ private variable
   f : A → B
 
 infixl 6 _⨭_
-
-∅ : Pred A ℓ
-∅ = λ _ → ⊥
 
 _⨭_ : ∀ {a} {A : Set a} (P : Pred A ℓ) (x : A) → Pred A (ℓ ⊔ a)
 P ⨭ x = P ∪ ｛ x ｝
@@ -54,3 +50,8 @@ f ⟦｛ x ｝⟧ = f ⟦ ｛ x ｝ ⟧
 
 ⊆⟦｛｝⟧ : ｛ f x ｝ ⊆ f ⟦｛ x ｝⟧
 ⊆⟦｛｝⟧ {x = x} refl = x , refl , refl
+
+replacement-syntax : ∀ {a} (A : Set a) {B : Set b} → (A → B) → Pred B (a ⊔ b)
+replacement-syntax A f = f ⟦ U {A = A} ⟧
+
+syntax replacement-syntax A (λ x → B) = ｛ B ∣ x ∈ A ｝

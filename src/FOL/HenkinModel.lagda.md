@@ -1,9 +1,9 @@
 ---
-title: Agda一阶逻辑(?) Henkin构造
+title: Agda一阶逻辑(?) Henkin模型
 zhihu-tags: Agda, 数理逻辑
 ---
 
-# Agda一阶逻辑(?) Henkin构造
+# Agda一阶逻辑(?) Henkin模型
 
 > 交流Q群: 893531731  
 > 本文源码: [HenkinModel.lagda.md](https://github.com/choukh/agda-flypitch/blob/main/src/FOL/HenkinModel.lagda.md)  
@@ -14,22 +14,25 @@ zhihu-tags: Agda, 数理逻辑
 
 module FOL.HenkinModel {u} where
 
+open import Level
 open import FOL.Language hiding (u)
-open import FOL.Language.Homomorphism using (_⟶_)
 open import FOL.Bounded.Base using (Formula; Sentence; Theory)
+import FOL.Language.Homomorphism as LHom
 import FOL.Bounded.Substitution
 open Language {u}
+open LHom using (_⟶_)
 ```
 
 ```agda
 open import Data.Nat using (ℕ)
 open import Function using (_$_; id)
+open import StdlibExt.Relation.Unary using (_∪_; _⟦_⟧; replacement-syntax)
 ```
 
 ```agda
 data Functions ℒ : ℕ → Set u where
-  including  : ∀ {n} → ℒ .functions n → Functions ℒ n
-  witnessing : Formula ℒ 1 → Functions ℒ 0
+  include  : ∀ {n} → ℒ .functions n → Functions ℒ n
+  witness : Formula ℒ 1 → Functions ℒ 0
 ```
 
 ```agda
@@ -38,13 +41,13 @@ Stepᴸ ℒ = record { functions = Functions ℒ ; relations = ℒ .relations }
 ```
 
 ```agda
-witnessOf : Formula ℒ 1 → Constants $ Stepᴸ ℒ
-witnessOf = Functions.witnessing
+languageMorph : ℒ ⟶ Stepᴸ ℒ
+languageMorph = record { funcMorph = Functions.include ; relMorph = id }
 ```
 
 ```agda
-ℒ-inclusion : ℒ ⟶ Stepᴸ ℒ
-ℒ-inclusion = record { funhom = Functions.including ; relhom = id }
+witnessOf : Formula ℒ 1 → Constants $ Stepᴸ ℒ
+witnessOf = Functions.witness
 ```
 
 ```agda
@@ -55,6 +58,7 @@ witnessOf = Functions.witnessing
 ```
 
 ```agda
---Step : Theory ℒ → Theory $ Stepᴸ ℒ
---Step = {!   !}
+Step : Theory ℒ → Theory $ Stepᴸ ℒ
+Step {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ ] ∣ φ ∈ Formula ℒ 1 ｝
+  where open LHom.Bounded languageMorph
 ```
