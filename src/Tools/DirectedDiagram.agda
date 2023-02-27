@@ -29,8 +29,8 @@ record DirectedDiagram (d : DirectedType {u} {v}) : Set (u ⊔ v ⊔ lsuc w) whe
     functorial : ∀ {x y z} {f₁ : x ~ y} {f₂ : y ~ z} {f₃ : x ~ z}
       → (morph f₃) ≡ (morph f₂) ∘ (morph f₁)
 
-directedTypeOfℕ : DirectedType
-directedTypeOfℕ = record
+ℕᴰ : DirectedType
+ℕᴰ = record
   { Carrier = ℕ
   ; _~_ = _≤_
   ; ~-refl = ≤-refl

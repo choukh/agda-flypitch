@@ -2,13 +2,13 @@
 
 module FOL.Language.Homomorphism {u} where
 open import FOL.Language hiding (u)
-open Language {u}
 
 open import Data.Nat
 open import Function using () renaming (_∘_ to _⟨∘⟩_)
 open import StdlibExt.Relation.Unary using (_⟦_⟧)
 
 record _⟶_ (ℒ₁ : Language) (ℒ₂ : Language) : Set u where
+  open Language {u}
   field
     funcMorph : ∀ {n} → ℒ₁ .functions n → ℒ₂ .functions n
     relMorph  : ∀ {n} → ℒ₁ .relations n → ℒ₂ .relations n

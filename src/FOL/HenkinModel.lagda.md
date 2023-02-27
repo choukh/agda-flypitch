@@ -17,6 +17,7 @@ module FOL.HenkinModel {u} where
 open import Level
 open import FOL.Language hiding (u)
 open import FOL.Bounded.Base using (Formula; Sentence; Theory)
+open import FOL.Language.Diagram using (Diagram)
 import FOL.Language.Homomorphism as LHom
 import FOL.Bounded.Substitution
 open Language {u}
@@ -27,6 +28,7 @@ open LHom using (_⟶_)
 open import Data.Nat using (ℕ; zero; suc)
 open import Function using (_$_; id)
 open import StdlibExt.Relation.Unary using (_∪_; _⟦_⟧; replacement-syntax)
+open import Tools.DirectedDiagram using (ℕᴰ)
 ```
 
 ```agda
@@ -64,11 +66,16 @@ Step {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ
 ```
 
 ```agda
-languageChain : ∀ {ℒ} → ℕ → Language
-languageChain {ℒ} zero    = ℒ
-languageChain {ℒ} (suc n) = Stepᴸ (languageChain {ℒ} n)
+chainᴸ : Language → ℕ → Language
+chainᴸ ℒ zero    = ℒ
+chainᴸ ℒ (suc n) = Stepᴸ (chainᴸ ℒ n)
 ```
 
 ```agda
---Diagram
+chainDiagram : Language → Diagram ℕᴰ
+chainDiagram ℒ = record
+  { obj = chainᴸ ℒ
+  ; morph = {!   !}
+  ; functorial = {!   !}
+  }
 ```
