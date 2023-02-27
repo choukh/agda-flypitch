@@ -16,7 +16,8 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 module FOL.HenkinModel {u} where
 
 open import FOL.Signature hiding (u) renaming (Signature to Language)
-open import FOL.Bounded.Base
+open import FOL.Bounded.Base using (Formula; Sentence; Theory)
+import FOL.Bounded.Substitution
 open import FOL.Signature.Homomorphism using (_⟶_)
 open Language {u}
 ```
@@ -33,21 +34,28 @@ data Functions ℒ : ℕ → Set u where
 ```
 
 ```agda
-stepᴸ : Language → Language
-stepᴸ ℒ = record { functions = Functions ℒ ; relations = ℒ .relations }
+Stepᴸ : Language → Language
+Stepᴸ ℒ = record { functions = Functions ℒ ; relations = ℒ .relations }
 ```
 
 ```agda
-witness : Formula ℒ 1 → Constants $ stepᴸ ℒ
-witness = Functions.witnessing
+witnessOf : Formula ℒ 1 → Constants $ Stepᴸ ℒ
+witnessOf = Functions.witnessing
 ```
 
 ```agda
-morph : ℒ ⟶ stepᴸ ℒ
-morph = record { funhomo = Functions.including ; relhomo = id }
+ℒ-inclusion : ℒ ⟶ Stepᴸ ℒ
+ℒ-inclusion = record { funhomo = Functions.including ; relhomo = id }
 ```
 
 ```agda
---[witness] : Formula ℒ 1 → Constants ℒ → Sentence ℒ
---[witness] φ c = {! (∃' φ) ⇒ φ [ const c / 0 ]  !}
+[_witnessing_] : Constants ℒ → Formula ℒ 1 → Sentence ℒ
+[_witnessing_] {ℒ} c φ = (∃' φ) ⇒ φ [ const c / 0 ] where
+  open FOL.Bounded.Base ℒ
+  open FOL.Bounded.Substitution ℒ
+```
+
+```agda
+--Step : Theory ℒ → Theory $ Stepᴸ ℒ
+--Step = {!   !}
 ```

@@ -14,12 +14,22 @@ open import Relation.Binary using (tri<; tri≈; tri>)
 open import Relation.Binary.PropositionalEquality
   using (_≡_; refl) renaming (subst to ≡-subst)
 
-substₜ : ∀ {m l} n (t : Termₗ (suc m + n) l) (s : Term n) → Termₗ (m + n) l
-substₜ {m} n (var k) s with <-cmp (toℕ k) m
+substₜ : ∀ {n m l} (t : Termₗ (suc n + m) l) (s : Term m) → Termₗ (n + m) l
+substₜ {n} {m} (var k) s with <-cmp (toℕ k) n
 ... | tri< k<n _ _  = var $ fromℕ< $ ≤-trans k<n (m≤m+n _ _)
-... | tri≈ _ _ _    = castₜ (≡-subst (_≤ m + n) (+-comm m _) ≤-refl) (s ↑ m)
+... | tri≈ _ _ _    = castₜ (≡-subst (_≤ n + m) (+-comm n _) ≤-refl) (s ↑ n)
 ... | tri> _ _ n<k  = var (reduce≥ k (≤-trans (s≤s z≤n) n<k))
-substₜ n (func f) s = func f
-substₜ n (app t₁ t₂) s = app (substₜ n t₁ s) (substₜ n t₂ s)
+substₜ (func f) s = func f
+substₜ (app t₁ t₂) s = app (substₜ t₁ s) (substₜ t₂ s)
 
-syntax substₜ n t s = t [ s / n ]ₜ
+syntax substₜ {n} t s = t [ s / n ]ₜ
+
+subst : ∀ {n m l} (φ : Formulaₗ (suc n + m) l) (s : Term m) → Formulaₗ (n + m) l
+subst ⊥ s = ⊥
+subst (rel R) s = rel R
+subst (appᵣ φ t) s = appᵣ (subst φ s) (substₜ t s)
+subst (t₁ ≈ t₂) s = substₜ t₁ s ≈ substₜ t₂ s
+subst (φ₁ ⇒ φ₂) s = subst φ₁ s ⇒ subst φ₂ s
+subst (∀' φ) s = ∀' subst φ s
+
+syntax subst {n} φ s = φ [ s / n ]
