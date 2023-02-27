@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
-module FOL.Bounded.Substitution (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Bounded.Substitution (ℒ : Language {u}) where
 open import FOL.Bounded.Base ℒ
 open import FOL.Bounded.Casting ℒ
 open import FOL.Bounded.Lifting ℒ

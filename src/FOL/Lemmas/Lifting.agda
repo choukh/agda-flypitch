@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
-module FOL.Lemmas.Lifting (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Lemmas.Lifting (ℒ : Language {u}) where
 open import FOL.Base ℒ hiding (⊥-elim)
 
 open import Data.Nat

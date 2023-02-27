@@ -1,6 +1,6 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
+open import FOL.Language
 open import FOL.Interpretation using (Interpretation)
 module FOL.Bounded.Lemmas.Realization (𝒮 : Interpretation {u} ℒ) where
 

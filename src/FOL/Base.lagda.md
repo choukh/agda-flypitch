@@ -12,15 +12,15 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 
 ## 前言
 
-本篇引入一阶逻辑的核心定义, 而性质的证明则放在后篇. 如上一篇所说, 本篇的所有内容都参数化到签名.
+本篇引入一阶逻辑的核心定义, 而性质的证明则放在后篇. 如上一篇所说, 本篇的所有内容都是参数化到语言的.
 
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Signature
-module FOL.Base (ℒ : Signature {u}) where
-open Signature ℒ
+open import FOL.Language
+module FOL.Base (ℒ : Language {u}) where
+open Language ℒ
 ```
 
 ### 标准库依赖
@@ -55,7 +55,7 @@ infix 4 _⊢_
 
 粗略类比, 如果说符号相当于字, 那么**项 (term)** 和**公式 (formula)** 则相当于词和句. 更准确地说, 项由变量与函数符号构成; 公式则由关系符号, 等号, 量化符号与连接符号等构成.
 
-与签名的处理类似地，我们把函数的元数编码进项的类型里：变量和常量是 **0-项**，n元函数是 **n-项**。此外，变量采用 [De Brujin编码](https://en.wikipedia.org/wiki/De_Bruijn_index)，即把任意自然数当作变量。
+与语言的处理类似地，我们把函数的元数编码进项的类型里：变量和常量是 **0-项**，n元函数是 **n-项**。此外，变量采用 [De Brujin编码](https://en.wikipedia.org/wiki/De_Bruijn_index)，即把任意自然数当作变量。
 
 **定义 (项)** 归纳定义 l-项:
 

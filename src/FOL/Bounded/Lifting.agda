@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
-module FOL.Bounded.Lifting (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Bounded.Lifting (ℒ : Language {u}) where
 open import FOL.Bounded.Base ℒ
 
 open import Data.Fin using (Fin; toℕ; cast; fromℕ<; _↑ˡ_; _↑ʳ_)

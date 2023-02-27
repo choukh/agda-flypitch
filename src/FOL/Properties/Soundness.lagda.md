@@ -13,8 +13,8 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Signature
-module FOL.Properties.Soundness (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Properties.Soundness (ℒ : Language {u}) where
 
 open import Level using (lift)
 open import Data.Nat using (ℕ)

@@ -1,7 +1,6 @@
 ---
 title: Agda一阶逻辑(?) Henkin构造
 zhihu-tags: Agda, 数理逻辑
-zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 ---
 
 # Agda一阶逻辑(?) Henkin构造
@@ -15,10 +14,10 @@ zhihu-url: https://zhuanlan.zhihu.com/p/604316612
 
 module FOL.HenkinModel {u} where
 
-open import FOL.Signature hiding (u) renaming (Signature to Language)
+open import FOL.Language hiding (u)
+open import FOL.Language.Homomorphism using (_⟶_)
 open import FOL.Bounded.Base using (Formula; Sentence; Theory)
 import FOL.Bounded.Substitution
-open import FOL.Signature.Homomorphism using (_⟶_)
 open Language {u}
 ```
 
@@ -45,7 +44,7 @@ witnessOf = Functions.witnessing
 
 ```agda
 ℒ-inclusion : ℒ ⟶ Stepᴸ ℒ
-ℒ-inclusion = record { funhomo = Functions.including ; relhomo = id }
+ℒ-inclusion = record { funhom = Functions.including ; relhom = id }
 ```
 
 ```agda

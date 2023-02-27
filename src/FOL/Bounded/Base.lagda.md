@@ -15,10 +15,10 @@ zhihu-tags: Agda, 数理逻辑
 {-# OPTIONS --cubical-compatible --safe #-}
 {-# OPTIONS --lossy-unification #-}
 
-open import FOL.Signature
-module FOL.Bounded.Base (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Bounded.Base (ℒ : Language {u}) where
 import FOL.Base ℒ as Free
-open Signature ℒ
+open Language ℒ
 open Free using (l) public
 open Free.Termₗ
 open Free.Formulaₗ

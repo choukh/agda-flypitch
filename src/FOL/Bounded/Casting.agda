@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
-module FOL.Bounded.Casting (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Bounded.Casting (ℒ : Language {u}) where
 open import FOL.Bounded.Base ℒ hiding (n)
 
 open import Data.Fin using (Fin; inject≤)

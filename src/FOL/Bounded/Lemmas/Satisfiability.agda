@@ -1,7 +1,7 @@
 {-# OPTIONS --cubical-compatible --safe #-}
 
-open import FOL.Signature
-module FOL.Bounded.Lemmas.Satisfiability (ℒ : Signature {u}) where
+open import FOL.Language
+module FOL.Bounded.Lemmas.Satisfiability (ℒ : Language {u}) where
 
 import FOL.Interpretation ℒ as Free
 open import FOL.Bounded.Base ℒ
