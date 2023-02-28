@@ -4,7 +4,7 @@ module FOL.Language.Homomorphism {u} where
 open import FOL.Language hiding (u)
 
 open import Data.Nat
-open import Function using () renaming (_∘_ to _⟨∘⟩_)
+open import Function using () renaming (id to ⟨id⟩; _∘_ to _⟨∘⟩_)
 open import StdlibExt.Relation.Unary using (_⟦_⟧)
 
 record _⟶_ (ℒ₁ : Language) (ℒ₂ : Language) : Set u where
@@ -12,6 +12,9 @@ record _⟶_ (ℒ₁ : Language) (ℒ₂ : Language) : Set u where
   field
     funcMorph : ∀ {n} → ℒ₁ .functions n → ℒ₂ .functions n
     relMorph  : ∀ {n} → ℒ₁ .relations n → ℒ₂ .relations n
+
+id : ℒ ⟶ ℒ
+id = record { funcMorph = ⟨id⟩ ; relMorph = ⟨id⟩ }
 
 _∘_ : ∀ {ℒ₁ ℒ₂ ℒ₃} → ℒ₂ ⟶ ℒ₃ → ℒ₁ ⟶ ℒ₂ → ℒ₁ ⟶ ℒ₃
 F ∘ G = record

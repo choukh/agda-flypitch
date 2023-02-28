@@ -11,22 +11,25 @@ zhihu-tags: Agda, 数理逻辑
 
 ```agda
 {-# OPTIONS --cubical-compatible --safe #-}
+{-# OPTIONS --lossy-unification #-}
 
 module FOL.HenkinModel {u} where
 
-open import Level
 open import FOL.Language hiding (u)
 open import FOL.Bounded.Base using (Formula; Sentence; Theory)
 open import FOL.Language.Diagram using (Diagram)
 import FOL.Language.Homomorphism as LHom
 import FOL.Bounded.Substitution
 open Language {u}
-open LHom using (_⟶_)
+open LHom using (_⟶_; _∘_) renaming (id to idᴸ)
 ```
 
 ```agda
-open import Data.Nat using (ℕ; zero; suc)
+open import Data.Sum
+open import Data.Nat
+open import Data.Nat.Properties
 open import Function using (_$_; id)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import StdlibExt.Relation.Unary using (_∪_; _⟦_⟧; replacement-syntax)
 open import Tools.DirectedDiagram using (ℕᴰ)
 ```
@@ -38,17 +41,52 @@ data Functions ℒ : ℕ → Set u where
 ```
 
 ```agda
-Stepᴸ : Language → Language
-Stepᴸ ℒ = record { functions = Functions ℒ ; relations = ℒ .relations }
+languageStep : Language → Language
+languageStep ℒ = record { functions = Functions ℒ ; relations = ℒ .relations }
 ```
 
 ```agda
-languageMorph : ℒ ⟶ Stepᴸ ℒ
+languageMorph : ℒ ⟶ languageStep ℒ
 languageMorph = record { funcMorph = Functions.include ; relMorph = id }
 ```
 
 ```agda
-witnessOf : Formula ℒ 1 → Constant $ Stepᴸ ℒ
+languageChainObject : Language → ℕ → Language
+languageChainObject ℒ zero    = ℒ
+languageChainObject ℒ (suc n) = languageStep (languageChainObject ℒ n)
+```
+
+```agda
+languageChainMorph : ∀ {x y} → x ≤ y → languageChainObject ℒ x ⟶ languageChainObject ℒ y
+languageChainMorph {ℒ} {zero} {zero}  z≤n = idᴸ
+languageChainMorph {ℒ} {x}    {suc y} x≤y with m≤n⇒m<n∨m≡n x≤y
+... | inj₁ (s≤s x≤y) = languageMorph ∘ languageChainMorph x≤y
+... | inj₂ refl      = idᴸ
+```
+
+```agda
+languageChainFunctorial : ∀ {x y z : ℕ} {f₁ : x ≤ y} {f₂ : y ≤ z} {f₃ : x ≤ z}
+  → languageChainMorph {ℒ} f₃ ≡ (languageChainMorph f₂ ∘ languageChainMorph f₁)
+languageChainFunctorial {ℒ} {zero} {zero} {zero}  {z≤n} {z≤n} {z≤n} = refl
+languageChainFunctorial {ℒ} {x}    {y}    {suc z} {x≤y} {y≤z} {x≤z}
+  with m≤n⇒m<n∨m≡n y≤z | m≤n⇒m<n∨m≡n x≤z
+... | inj₁ (s≤s y≤z) | inj₁ (s≤s x≤z) = {!   !} --languageChainFunctorial {f₁ = x≤y} {f₂ = y≤z} {f₃ = x≤z}
+... | inj₁ (s≤s y≤z) | inj₂ y≡sz      = {!   !}
+... | inj₂ x≡sz      | inj₁ (s≤s x≤z) = {!   !}
+... | inj₂ x≡sz      | inj₂ y≡sz      = {!   !}
+```
+
+```agda
+languageChain : Language → Diagram ℕᴰ
+languageChain ℒ = record
+  { obj         = languageChainObject ℒ
+  ; morph       = languageChainMorph
+  ; functorial  = languageChainFunctorial
+  }
+```
+
+```agda
+witnessOf : Formula ℒ 1 → Constant $ languageStep ℒ
 witnessOf = Functions.witness
 ```
 
@@ -60,22 +98,7 @@ witnessOf = Functions.witness
 ```
 
 ```agda
-Step : Theory ℒ → Theory $ Stepᴸ ℒ
-Step {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ ] ∣ φ ∈ Formula ℒ 1 ｝
+theoryStep : Theory ℒ → Theory $ languageStep ℒ
+theoryStep {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ ] ∣ φ ∈ Formula ℒ 1 ｝
   where open LHom.Bounded languageMorph
-```
-
-```agda
-chainᴸ : Language → ℕ → Language
-chainᴸ ℒ zero    = ℒ
-chainᴸ ℒ (suc n) = Stepᴸ (chainᴸ ℒ n)
-```
-
-```agda
-chainDiagram : Language → Diagram ℕᴰ
-chainDiagram ℒ = record
-  { obj = chainᴸ ℒ
-  ; morph = {!   !}
-  ; functorial = {!   !}
-  }
 ```
