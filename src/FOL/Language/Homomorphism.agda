@@ -5,7 +5,11 @@ open import FOL.Language hiding (u)
 
 open import Data.Nat
 open import Function using () renaming (id to ⟨id⟩; _∘_ to _⟨∘⟩_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import StdlibExt.Relation.Unary using (_⟦_⟧)
+
+private variable
+  ℒ₁ ℒ₂ ℒ₃ : Language
 
 record _⟶_ (ℒ₁ : Language) (ℒ₂ : Language) : Set u where
   open Language {u}
@@ -16,12 +20,12 @@ record _⟶_ (ℒ₁ : Language) (ℒ₂ : Language) : Set u where
 id : ℒ ⟶ ℒ
 id = record { funcMorph = ⟨id⟩ ; relMorph = ⟨id⟩ }
 
-_∘_ : ∀ {ℒ₁ ℒ₂ ℒ₃} → ℒ₂ ⟶ ℒ₃ → ℒ₁ ⟶ ℒ₂ → ℒ₁ ⟶ ℒ₃
+_∘_ : ℒ₂ ⟶ ℒ₃ → ℒ₁ ⟶ ℒ₂ → ℒ₁ ⟶ ℒ₃
 F ∘ G = record
   { funcMorph = F .funcMorph ⟨∘⟩ G .funcMorph
   ; relMorph  = F .relMorph  ⟨∘⟩ G .relMorph } where open _⟶_
 
-module Bounded {ℒ₁ ℒ₂} (F : ℒ₁ ⟶ ℒ₂) where
+module Bounded (F : ℒ₁ ⟶ ℒ₂) where
   open import FOL.Bounded.Base {u} hiding (n; l)
   open _⟶_ {ℒ₁} {ℒ₂} F
 
