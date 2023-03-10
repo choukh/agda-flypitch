@@ -25,11 +25,12 @@ open LHom using (_⟶_; _∘_) renaming (id to idᴸ)
 ```
 
 ```agda
-open import Data.Sum
 open import Data.Nat
 open import Data.Nat.Properties
+open import Data.Empty using (⊥-elim)
+open import Data.Sum using (inj₁; inj₂)
 open import Function using (_$_; id)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 open import StdlibExt.Relation.Unary using (_∪_; _⟦_⟧; replacement-syntax)
 open import Tools.DirectedDiagram using (ℕᴰ)
 ```
@@ -58,22 +59,30 @@ languageChainObject ℒ (suc n) = languageStep (languageChainObject ℒ n)
 
 ```agda
 languageChainMorph : ∀ {x y} → x ≤ y → languageChainObject ℒ x ⟶ languageChainObject ℒ y
-languageChainMorph {ℒ} {zero} {zero}  z≤n = idᴸ
-languageChainMorph {ℒ} {x}    {suc y} x≤y with m≤n⇒m<n∨m≡n x≤y
-... | inj₁ (s≤s x≤y) = languageMorph ∘ languageChainMorph x≤y
-... | inj₂ refl      = idᴸ
+languageChainMorph {ℒ} {x} {y} x≤y with m≤n⇒m<n∨m≡n x≤y
+... | inj₁ (s≤s x≤y-1) = languageMorph ∘ languageChainMorph x≤y-1
+... | inj₂ refl = idᴸ
+```
+
+```agda
+fuck : ∀ {x y} → (f₁ : x ≤ y) → (f₂ : x ≤ y) → languageChainMorph f₁ ≡ languageChainMorph f₂
+fuck f₁ f₂ = {! refl  !}
 ```
 
 ```agda
 languageChainFunctorial : ∀ {x y z : ℕ} {f₁ : x ≤ y} {f₂ : y ≤ z} {f₃ : x ≤ z}
   → languageChainMorph {ℒ} f₃ ≡ (languageChainMorph f₂ ∘ languageChainMorph f₁)
-languageChainFunctorial {ℒ} {zero} {zero} {zero}  {z≤n} {z≤n} {z≤n} = refl
-languageChainFunctorial {ℒ} {x}    {y}    {suc z} {x≤y} {y≤z} {x≤z}
-  with m≤n⇒m<n∨m≡n y≤z | m≤n⇒m<n∨m≡n x≤z
-... | inj₁ (s≤s y≤z) | inj₁ (s≤s x≤z) = {!   !} --languageChainFunctorial {f₁ = x≤y} {f₂ = y≤z} {f₃ = x≤z}
-... | inj₁ (s≤s y≤z) | inj₂ y≡sz      = {!   !}
-... | inj₂ x≡sz      | inj₁ (s≤s x≤z) = {!   !}
-... | inj₂ x≡sz      | inj₂ y≡sz      = {!   !}
+languageChainFunctorial {ℒ} {x} {y} {z} {x≤y} {y≤z} {x≤z} with m≤n⇒m<n∨m≡n x≤y | m≤n⇒m<n∨m≡n y≤z | m≤n⇒m<n∨m≡n x≤z
+... | inj₁ x<x  | inj₂ refl | inj₂ refl = ⊥-elim (<-irrefl refl x<x)
+... | inj₂ refl | inj₁ x<x  | inj₂ refl = ⊥-elim (<-irrefl refl x<x)
+... | inj₂ refl | inj₂ refl | inj₁ x<x  = ⊥-elim (<-irrefl refl x<x)
+... | inj₁ x<y  | inj₁ y<x  | inj₂ refl = ⊥-elim (<-asym x<y y<x)
+... | inj₁ (s≤s x≤y-1) | inj₁ (s≤s y≤z-1) | inj₁ (s≤s x≤z-1) = {!   !} --cong (languageMorph ∘_) {!   !}
+--languageChainFunctorial {f₁ = x≤y} {f₂ = y≤z-1} {f₃ = x≤z-1}
+--languageChainFunctorial {f₁ = x≤y-1} {f₂ = ?} {f₃ = x≤y}
+... | inj₂ refl | inj₁ x<z  | inj₁ _    = {!   !}
+... | inj₁ x<y  | inj₂ refl | inj₁ _    = {!   !}
+... | inj₂ refl | inj₂ refl | inj₂ fuck = {!   !}
 ```
 
 ```agda
@@ -102,3 +111,4 @@ theoryStep : Theory ℒ → Theory $ languageStep ℒ
 theoryStep {ℒ} Γ = theoryMorph Γ ∪ ｛ [ witnessOf φ witnessing formulaMorph φ ] ∣ φ ∈ Formula ℒ 1 ｝
   where open LHom.Bounded languageMorph
 ```
+ 
